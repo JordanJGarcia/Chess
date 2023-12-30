@@ -100,7 +100,6 @@ class BitBoard {
         if(firstMove)
             openMoves |= openMoves >> 8;
 
-        print(openMoves & ~currentState);
         return openMoves & ~currentState;
     }
 
@@ -144,7 +143,6 @@ class BitBoard {
             else break;
             i += 8;
         }
-        print(openMoves);
         return openMoves;
     }
 
@@ -196,7 +194,6 @@ class BitBoard {
                 else break;
             }
         }
-        print(openMoves);
         return openMoves;
     }
 
@@ -226,7 +223,16 @@ class BitBoard {
                     openMoves |= masks[loc];
             }
         }
-        print(openMoves);
+        return openMoves;
+    }
+
+    // QUEEN
+    long getQueenMoves(int pos) {
+        long openMoves = 0L;
+
+        openMoves |= getRookMoves(pos);
+        openMoves |= getBishopMoves(pos);
+
         return openMoves;
     }
 
@@ -234,17 +240,9 @@ class BitBoard {
     // main
     public static void main(String[] args) {
         BitBoard bb =  new BitBoard();
-        //bb.getPawnMoves(50, true);
-        //bb.getPawnMoves(43, false);
-        //bb.getRookMoves(56);
-        //bb.getRookMoves(34);
-        //bb.getRookMoves(29);
-        //bb.getBishopMoves(28);
-        //bb.getBishopMoves(61);
-        //bb.getBishopMoves(33);
-        bb.getKnightMoves(35);
-        bb.getKnightMoves(1);
-        bb.getKnightMoves(23);
-        
+
+        bb.print(bb.getQueenMoves(59));
+        bb.print(bb.getQueenMoves(3));
+        bb.print(bb.getQueenMoves(35));
     }
 }
