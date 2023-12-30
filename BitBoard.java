@@ -22,7 +22,6 @@ class BitBoard {
         0x00FF000000000000L, // PAWN
     };
     
-    
     final long[] BLACKPIECES = {
         0x0000000000000010L, // KING   
         0x0000000000000008L, // QUEEN  
@@ -43,7 +42,6 @@ class BitBoard {
         createBoard();
     }
 
-
     // creates the initial board to play on
     void createBoard() {
         initializeWhiteBits();
@@ -59,7 +57,6 @@ class BitBoard {
         print(currentState);
         System.out.print("\n");
     }
-
 
     // prints state of a long (board or portions of board) 
     void print(long board) {
@@ -199,14 +196,38 @@ class BitBoard {
                 else break;
             }
         }
-
         print(openMoves);
         return openMoves;
     }
 
     // KNIGHT
-    long getKnightMoves() {
-        return 0L;
+    long getKnightMoves(int pos) {
+        long openMoves = 0L;
+        int[] val = {6, 10, 15, 17}; // all positions knight can move (up or down from current pos)
+        int loc;
+
+        for(int j = 0; j < 4; j++) {
+            if(j == 0 || j == 2) {
+                loc = pos - val[j];
+                if(loc % 8 > pos % 8 && loc >= 0)
+                    openMoves |= masks[loc];
+
+                loc = pos + val[j];
+                if(loc % 8 < pos % 8 && loc < 64)
+                    openMoves |= masks[loc];
+            }
+            else {
+                loc = pos - val[j];
+                if(loc % 8 < pos % 8 && loc >= 0)
+                    openMoves |= masks[loc];
+
+                loc = pos + val[j];
+                if(loc % 8 > pos % 8 && loc < 64)
+                    openMoves |= masks[loc];
+            }
+        }
+        print(openMoves);
+        return openMoves;
     }
 
 
@@ -218,8 +239,12 @@ class BitBoard {
         //bb.getRookMoves(56);
         //bb.getRookMoves(34);
         //bb.getRookMoves(29);
-        bb.getBishopMoves(28);
-        bb.getBishopMoves(61);
-        bb.getBishopMoves(33);
+        //bb.getBishopMoves(28);
+        //bb.getBishopMoves(61);
+        //bb.getBishopMoves(33);
+        bb.getKnightMoves(35);
+        bb.getKnightMoves(1);
+        bb.getKnightMoves(23);
+        
     }
 }
