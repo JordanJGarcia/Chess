@@ -93,14 +93,28 @@ class BitBoard {
     // the below functions will generate masks of available moves for each piece
 
     // PAWN
-    long getPawnMoves(int pos, boolean firstMove) {
+    // pawns are unique in that they can only move forward
+    // so they must have an orientation (direction/color)
+    long getPawnMoves(int pos, Orientation or, boolean firstMove) {
         long openMoves = 0L;
 
-        openMoves = masks[pos] >> 8;
-        if(firstMove)
-            openMoves |= openMoves >> 8;
+        if(or == Orientation.WHITE) {
+            if(getBitValue(currentState, pos - 8) == 0) {
+                openMoves = masks[pos - 8];
 
-        return openMoves & ~currentState;
+                if(firstMove && getBitValue(currentState, pos - 16) == 0)
+                    openMoves |= masks[pos - 16];
+            }
+        }
+        else {
+            if(getBitValue(currentState, pos + 8) == 0) {
+                openMoves = masks[pos + 8];
+
+                if(firstMove && getBitValue(currentState, pos + 16) == 0)
+                    openMoves |= masks[pos + 16];
+            }
+        }
+        return openMoves;
     }
 
     // ROOK
@@ -241,8 +255,10 @@ class BitBoard {
     public static void main(String[] args) {
         BitBoard bb =  new BitBoard();
 
-        bb.print(bb.getQueenMoves(59));
-        bb.print(bb.getQueenMoves(3));
-        bb.print(bb.getQueenMoves(35));
+        bb.print(bb.getPawnMoves(51, Orientation.WHITE, true));
+        bb.print(bb.getPawnMoves(44, Orientation.WHITE, false));
+        bb.print(bb.getPawnMoves(10, Orientation.BLACK, true));
+        bb.print(bb.getPawnMoves(19, Orientation.BLACK, false));
+        bb.print(bb.getPawnMoves(35, Orientation.BLACK, false));
     }
 }
