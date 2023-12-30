@@ -3,6 +3,7 @@ package chess;
 import java.util.*;
 import java.awt.*;
 import javax.swing.*;
+import java.lang.Math;
 
 class BitBoard {
 
@@ -217,22 +218,22 @@ class BitBoard {
         int[] val = {6, 10, 15, 17}; // all positions knight can move (up or down from current pos)
         int loc;
 
-        for(int j = 0; j < 4; j++) {
-            if(j == 0 || j == 2) {
-                loc = pos - val[j];
+        for(int v : val) {
+            if(v == 6 || v == 15) {
+                loc = pos - v;
                 if(loc % 8 > pos % 8 && loc >= 0)
                     openMoves |= masks[loc];
 
-                loc = pos + val[j];
+                loc = pos + v;
                 if(loc % 8 < pos % 8 && loc < 64)
                     openMoves |= masks[loc];
             }
             else {
-                loc = pos - val[j];
+                loc = pos - v;
                 if(loc % 8 < pos % 8 && loc >= 0)
                     openMoves |= masks[loc];
 
-                loc = pos + val[j];
+                loc = pos + v;
                 if(loc % 8 > pos % 8 && loc < 64)
                     openMoves |= masks[loc];
             }
@@ -250,15 +251,39 @@ class BitBoard {
         return openMoves;
     }
 
+    // KING
+    long getKingMoves(int pos) {
+        long openMoves = 0L;
+        int[] val = {1, 7, 8, 9};
+        int loc, offset;
+
+        for(int v : val) {
+            loc = pos - v;
+            offset = Math.abs((loc % 8) - (pos % 8));
+            if(offset == 0 || offset == 1) {
+                if(getBitValue(currentState, loc) == 0 && loc >= 0)
+                    openMoves |= masks[loc];
+            }
+
+            loc = pos + v;
+            offset = Math.abs((loc % 8) - (pos % 8));
+            if(offset == 0 || offset == 1) {
+                if(getBitValue(currentState, loc) == 0 && loc < 64)
+                    openMoves |= masks[loc];
+            }
+        } 
+        return openMoves;
+    }
+
 
     // main
     public static void main(String[] args) {
         BitBoard bb =  new BitBoard();
 
-        bb.print(bb.getPawnMoves(51, Orientation.WHITE, true));
-        bb.print(bb.getPawnMoves(44, Orientation.WHITE, false));
-        bb.print(bb.getPawnMoves(10, Orientation.BLACK, true));
-        bb.print(bb.getPawnMoves(19, Orientation.BLACK, false));
-        bb.print(bb.getPawnMoves(35, Orientation.BLACK, false));
+        bb.print(bb.getKingMoves(4));
+        bb.print(bb.getKingMoves(10));
+        bb.print(bb.getKingMoves(36));
+        bb.print(bb.getKnightMoves(47));
+        bb.print(bb.getKnightMoves(60));
     }
 }
