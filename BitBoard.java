@@ -10,9 +10,9 @@ class BitBoard {
     private long[] masks = null;
 
     // long availableSpots;
-    private long currentState;
-    private long currentWhiteState;
-    private long currentBlackState;
+    private long board;
+    private long white;
+    private long black;
 
     final long[] WHITEPIECES = {
         0x1000000000000000L, // KING
@@ -47,43 +47,43 @@ class BitBoard {
     void createBoard() {
         initializeWhiteBits();
         System.out.println("\nWhite state: \n");
-        print(currentWhiteState);
+        print(white);
 
         initializeBlackBits();
         System.out.println("\nBlack state: \n");
-        print(currentBlackState);
+        print(black);
 
-        currentState = currentBlackState | currentWhiteState;
+        board = black | white;
         System.out.println("\nBoard state: \n");
-        print(currentState);
+        print(board);
         System.out.print("\n");
     }
 
     // prints state of a long (board or portions of board) 
-    void print(long board) {
-        for(int k = 0; k < 64; k++) {
-            if((k+1)%8 == 0 && k != 0)
-                System.out.println(getBitValue(board, k) + " ");
+    void print(long l) {
+        for(int p = 0; p < 64; p++) {
+            if((p+1)%8 == 0 && p != 0)
+                System.out.println(getBitValue(l, p) + " ");
             else
-                System.out.print(getBitValue(board, k) + " ");
+                System.out.print(getBitValue(l, p) + " ");
         }
         System.out.println("");
     }
 
     void printBitBoard() {
         System.out.println("Board state: ");
-        print(currentState);
+        print(board);
     }
 
     void initializeWhiteBits() {
         for(int i = 0; i < WHITEPIECES.length; i++)
-            currentWhiteState = currentWhiteState | WHITEPIECES[i];
+            white = white | WHITEPIECES[i];
     }
 
 
     void initializeBlackBits() {
         for(int i = 0; i < BLACKPIECES.length; i++)
-            currentBlackState = currentBlackState | BLACKPIECES[i];
+            black = black | BLACKPIECES[i];
     }    
 
     // returns value at certain position in mask (0 or 1)
@@ -104,16 +104,16 @@ class BitBoard {
     // PAWN
     long getPawnMoves(int pos, Orientation or, boolean firstMove) {
         long openMoves = 0L;
-        long opponent = (or == Orientation.WHITE ? currentBlackState : currentWhiteState);
+        long opponent = (or == Orientation.WHITE ? black : white);
         int loc;
 
         if(or == Orientation.WHITE) {
             loc = pos - 8;
-            if(getBitValue(currentState, loc) == 0) {
+            if(getBitValue(board, loc) == 0) {
                 openMoves = masks[loc];
 
                 // can move two positions on first move
-                if(firstMove && getBitValue(currentState, loc - 8) == 0)
+                if(firstMove && getBitValue(board, loc - 8) == 0)
                     openMoves |= masks[loc - 8];
             }
             // add attacks if they exist
@@ -127,11 +127,11 @@ class BitBoard {
         }
         else {
             loc = pos + 8;
-            if(getBitValue(currentState, loc) == 0) {
+            if(getBitValue(board, loc) == 0) {
                 openMoves = masks[loc];
 
                 // can move two positions on first move
-                if(firstMove && getBitValue(currentState, loc + 8) == 0)
+                if(firstMove && getBitValue(board, loc + 8) == 0)
                     openMoves |= masks[loc + 8];
             }
             // add attacks if they exist
@@ -149,8 +149,8 @@ class BitBoard {
     // ROOK
     long getRookMoves(int pos, Orientation or) {
         long openMoves = 0L;
-        long opponent = (or == Orientation.WHITE ? currentBlackState : currentWhiteState);
-        long me = (or == Orientation.WHITE ? currentWhiteState : currentBlackState);
+        long opponent = (or == Orientation.WHITE ? black : white);
+        long me = (or == Orientation.WHITE ? white : black);
         int i;
 
         // open moves to the right (white) or left (black)
@@ -214,8 +214,8 @@ class BitBoard {
     // BISHOP
     long getBishopMoves(int pos, Orientation or) {
         long openMoves = 0L;
-        long opponent = (or == Orientation.WHITE ? currentBlackState : currentWhiteState);
-        long me = (or == Orientation.WHITE ? currentWhiteState : currentBlackState);
+        long opponent = (or == Orientation.WHITE ? black : white);
+        long me = (or == Orientation.WHITE ? white : black);
         int i;
 
         // open moves up-right (white) or down-left (black)
@@ -312,9 +312,9 @@ class BitBoard {
         }
 
         if(or == Orientation.WHITE)
-            return openMoves & ~currentWhiteState;
+            return openMoves & ~white;
 
-        return openMoves & ~currentBlackState;
+        return openMoves & ~black;
     }
 
     // QUEEN
@@ -330,8 +330,8 @@ class BitBoard {
     // KING
     long getKingMoves(int pos, Orientation or) {
         long openMoves = 0L;
-        long opponent = (or == Orientation.WHITE ? currentBlackState : currentWhiteState);
-        long me = (or == Orientation.WHITE ? currentWhiteState : currentBlackState);
+        long opponent = (or == Orientation.WHITE ? black : white);
+        long me = (or == Orientation.WHITE ? white : black);
         int[] val = {1, 7, 8, 9};
         int loc, offset;
 
@@ -355,7 +355,7 @@ class BitBoard {
 
     // generate available attacks for a piece
     long getAttacks(long moves, Orientation or) {
-        long opponent = (or == Orientation.WHITE ? currentBlackState : currentWhiteState);
+        long opponent = (or == Orientation.WHITE ? black : white);
         return moves & opponent;
     }
 
@@ -364,12 +364,12 @@ class BitBoard {
     // main
     public static void main(String[] args) {
         BitBoard bb =  new BitBoard();
-        bb.currentState = bb.moveBit(bb.currentState, 8, 24);
-        bb.currentBlackState = bb.moveBit(bb.currentBlackState, 8, 24);
+        bb.board = bb.moveBit(bb.board, 8, 24);
+        bb.black = bb.moveBit(bb.black, 8, 24);
         bb.printBitBoard();
 
-        bb.currentState = bb.moveBit(bb.currentState, 15, 23);
-        bb.currentBlackState = bb.moveBit(bb.currentBlackState, 15, 23);
+        bb.board = bb.moveBit(bb.board, 15, 23);
+        bb.black = bb.moveBit(bb.black, 15, 23);
         bb.printBitBoard();
 
         bb.print(bb.getKingMoves(33, Orientation.WHITE));
