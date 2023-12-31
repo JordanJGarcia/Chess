@@ -285,9 +285,6 @@ class BitBoard {
     }
 
     // KNIGHT
-    // knights need an orientation parameter since their move mask and attack mask
-    // are the same, however we cannot include white pieces in the white attack mask
-    // and vice versa
     long getKnightMoves(int pos, Orientation or) {
         long openMoves = 0L;
         int[] val = {6, 10, 15, 17}; // all positions knight can move (up or down from current pos)
@@ -356,6 +353,13 @@ class BitBoard {
         return openMoves;
     }
 
+    // generate available attacks for a piece
+    long getAttacks(long moves, Orientation or) {
+        long opponent = (or == Orientation.WHITE ? currentBlackState : currentWhiteState);
+        return moves & opponent;
+    }
+
+
 
     // main
     public static void main(String[] args) {
@@ -371,7 +375,13 @@ class BitBoard {
         bb.print(bb.getKingMoves(33, Orientation.WHITE));
         bb.print(bb.getKingMoves(24, Orientation.BLACK));
         bb.print(bb.getKingMoves(21, Orientation.WHITE));
-        bb.print(bb.getKingMoves(60, Orientation.WHITE));
+        bb.print(bb.getAttacks(bb.getKingMoves(21, Orientation.WHITE), Orientation.WHITE));
+
+        bb.print(bb.getRookMoves(40, Orientation.WHITE));
+        bb.print(bb.getAttacks(bb.getRookMoves(40, Orientation.WHITE), Orientation.WHITE));
+
+        bb.print(bb.getQueenMoves(28, Orientation.BLACK));
+        bb.print(bb.getAttacks(bb.getQueenMoves(28, Orientation.BLACK), Orientation.BLACK));
 
     }
 }
