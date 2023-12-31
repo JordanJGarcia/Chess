@@ -59,7 +59,17 @@ class BitBoard {
         System.out.print("\n");
     }
 
-    // prints state of a long (board or portions of board) 
+    void initializeWhiteBits() {
+        for(int i = 0; i < WHITEPIECES.length; i++)
+            white |= WHITEPIECES[i];
+    }
+
+    void initializeBlackBits() {
+        for(int i = 0; i < BLACKPIECES.length; i++)
+            black |= BLACKPIECES[i];
+    }    
+
+    // prints state of a long (board)
     void print(long l) {
         for(int p = 0; p < 64; p++) {
             if((p+1)%8 == 0 && p != 0)
@@ -75,29 +85,42 @@ class BitBoard {
         print(board);
     }
 
-    void initializeWhiteBits() {
-        for(int i = 0; i < WHITEPIECES.length; i++)
-            white = white | WHITEPIECES[i];
-    }
-
-
-    void initializeBlackBits() {
-        for(int i = 0; i < BLACKPIECES.length; i++)
-            black = black | BLACKPIECES[i];
-    }    
-
     // returns value at certain position in mask (0 or 1)
     long getBitValue(long mask, int pos) {
         return ((mask >> pos) & 1);
     }
 
-    // moves a bit in board from o position to n
-    long moveBit(long board, int o, int n) {
-        board |= masks[n];
-        board &= ~(1L << o);
+    // moves a bit in board b from position o to position n
+    long moveBit(long b, int o, int n) {
+        b |= masks[n];
+        b &= ~(1L << o);
+        return b;
+    }
+
+    // setters/getters
+    void setBoard(long val) {
+        board = val;
+    }
+
+    long getBoard() {
         return board;
     }
 
+    void setWhite(long val) {
+        white = val;
+    }
+
+    long getWhite() {
+        return white;
+    }
+
+    void setBlack(long val) {
+        black = val;
+    }
+
+    long getBlack() {
+        return black;
+    }
 
     // the below functions will generate masks of available moves for each piece
 
@@ -364,24 +387,14 @@ class BitBoard {
     // main
     public static void main(String[] args) {
         BitBoard bb =  new BitBoard();
-        bb.board = bb.moveBit(bb.board, 8, 24);
-        bb.black = bb.moveBit(bb.black, 8, 24);
+        bb.setBoard(bb.moveBit(bb.board, 8, 24));
+        bb.setBlack(bb.moveBit(bb.black, 8, 24));
         bb.printBitBoard();
+        bb.print(bb.getBlack());
 
-        bb.board = bb.moveBit(bb.board, 15, 23);
-        bb.black = bb.moveBit(bb.black, 15, 23);
+        bb.setBoard(bb.moveBit(bb.board, 52, 28));
+        bb.setWhite(bb.moveBit(bb.white, 52, 28));
         bb.printBitBoard();
-
-        bb.print(bb.getKingMoves(33, Orientation.WHITE));
-        bb.print(bb.getKingMoves(24, Orientation.BLACK));
-        bb.print(bb.getKingMoves(21, Orientation.WHITE));
-        bb.print(bb.getAttacks(bb.getKingMoves(21, Orientation.WHITE), Orientation.WHITE));
-
-        bb.print(bb.getRookMoves(40, Orientation.WHITE));
-        bb.print(bb.getAttacks(bb.getRookMoves(40, Orientation.WHITE), Orientation.WHITE));
-
-        bb.print(bb.getQueenMoves(28, Orientation.BLACK));
-        bb.print(bb.getAttacks(bb.getQueenMoves(28, Orientation.BLACK), Orientation.BLACK));
-
+        bb.print(bb.getWhite());
     }
 }
