@@ -90,11 +90,16 @@ class BitBoard {
         return ((mask >> pos) & 1);
     }
 
-    // moves a bit in board b from position o to position n
-    long moveBit(long b, int o, int n) {
-        b |= masks[n];
-        b &= ~(1L << o);
-        return b;
+    // moves a bit in board b from position o to position n,
+    // only if it exists in board g as well
+    long moveBit(long b, int o, int n, long g) {
+
+        if((masks[n] & g) != masks[n])
+            return 0L;
+
+        long r = b | masks[n];
+        r &= ~(1L << o);
+        return r;
     }
 
     // setters/getters
@@ -121,6 +126,42 @@ class BitBoard {
     long getBlack() {
         return black;
     }
+
+    // play
+    int playForBlack(long moves, int from, int to) {
+        long newBoard = moveBit(board, from, to, moves);
+        if(newBoard == 0L) {
+            System.err.println("error: invalid move");
+            return -1;
+        }
+        setBoard(newBoard);
+
+        newBoard = moveBit(black, from, to, moves);
+        if(newBoard == 0L) {
+            System.err.println("error: could not set black bitboard");
+            return -1;
+        }
+        setBlack(moveBit(black, from, to, moves));
+        return 0;
+    }
+
+    int playForWhite(long moves, int from, int to) {
+        long newBoard = moveBit(board, from, to, moves);
+        if(newBoard == 0L) {
+            System.err.println("error: invalid move");
+            return -1;
+        }
+        setBoard(newBoard);
+
+        newBoard = moveBit(white, from, to, moves);
+        if(newBoard == 0L) {
+            System.err.println("error: could not set white bitboard");
+            return -1;
+        }
+        setWhite(newBoard);
+        return 0;
+    }
+
 
     // the below functions will generate masks of available moves for each piece
 
@@ -387,13 +428,16 @@ class BitBoard {
     // main
     public static void main(String[] args) {
         BitBoard bb =  new BitBoard();
-        bb.setBoard(bb.moveBit(bb.board, 8, 24));
-        bb.setBlack(bb.moveBit(bb.black, 8, 24));
+
+        // play for black
+        long validMoves = bb.getPawnMoves(8, Orientation.BLACK, true);
+        bb.playForBlack(validMoves, 8, 24);
         bb.printBitBoard();
         bb.print(bb.getBlack());
 
-        bb.setBoard(bb.moveBit(bb.board, 52, 28));
-        bb.setWhite(bb.moveBit(bb.white, 52, 28));
+        // play for white
+        validMoves = bb.getPawnMoves(52, Orientation.WHITE, true);
+        bb.playForWhite(validMoves, 52, 36);
         bb.printBitBoard();
         bb.print(bb.getWhite());
     }
