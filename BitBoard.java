@@ -2,7 +2,6 @@ package chess;
 
 import java.util.*;
 import java.awt.*;
-import javax.swing.*;
 import java.lang.Math;
 
 class BitBoard {
