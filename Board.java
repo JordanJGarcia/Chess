@@ -12,16 +12,16 @@ class Board {
 
     // default constructor
     Board() {
-        this.p1 = new Player(Color.WHITE);
-        this.p2 = new Player(Color.BLACK);
-        this.bb = new BitBoard();
+        bb = new BitBoard();
+        p1 = new Player(Orientation.WHITE, bb);
+        p2 = new Player(Orientation.BLACK, bb);
     }
 
     // constructor
     Board(Player p1, Player p2, BitBoard bb) {
-        this.setPlayerOne(p1);
-        this.setPlayerTwo(p2);
-        this.setBitBoard(bb);
+        setPlayerOne(p1);
+        setPlayerTwo(p2);
+        setBitBoard(bb);
     }
 
     // setters/getters
@@ -33,22 +33,33 @@ class Board {
     }
 
     void setPlayerOne(Player p) {
-        this.p1 = p;
+        p1 = p;
     }
 
     void setPlayerTwo(Player p) {
-        this.p2 = p;
+        p2 = p;
+    }
+
+    Player getPlayerOne() {
+        return p1;
+    }
+
+    Player getPlayerTwo() {
+        return p2;
     }
 
     void getBitBoard() {
-        this.bb.printBitBoard();
+        bb.printBitBoard();
     }
 
     void setBitBoard(BitBoard b) {
-        this.bb = b;
+        bb = b;
     }
     
     public static void main(String[] args) {
         Board board = new Board();
+        board.printPlayerData();
+        System.out.println("request status (WHITE): " + board.getPlayerOne().requestMove(48, 32));
+        board.printPlayerData();
     }
 }
