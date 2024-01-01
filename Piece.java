@@ -46,10 +46,6 @@ class Piece {
 
     @Override public String toString() {
         return("\n" + getOrientation() + " " + getType() + ": " + getPosition());
-//        return("\nType: " + getType()
-//               + "\nColor: " + getPieceColor()
-//               + "\nPosition: " + getPosition()
-//               + "\nNumber of moves: " + getNumMoves());
     }
 
     int getNumMoves() {
@@ -60,7 +56,7 @@ class Piece {
            numMoves++; 
     }
 
-    void setNumMoves( int n ) {
+    void setNumMoves(int n) {
         numMoves = n;
     }
 
