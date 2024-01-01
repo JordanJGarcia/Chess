@@ -130,35 +130,37 @@ class BitBoard {
     // play
     int playForBlack(long moves, int from, int to) {
         long newBoard = moveBit(board, from, to, moves);
+        long newBlack = moveBit(black, from, to, moves);
+
         if(newBoard == 0L) {
             System.err.println("error: invalid move");
             return -1;
         }
-        setBoard(newBoard);
 
-        newBoard = moveBit(black, from, to, moves);
-        if(newBoard == 0L) {
+        if(newBlack == 0L) {
             System.err.println("error: could not set black bitboard");
             return -1;
         }
-        setBlack(moveBit(black, from, to, moves));
+        setBoard(newBoard);
+        setBlack(newBlack);
         return 0;
     }
 
     int playForWhite(long moves, int from, int to) {
         long newBoard = moveBit(board, from, to, moves);
+        long newWhite = moveBit(white, from, to, moves);
+
         if(newBoard == 0L) {
             System.err.println("error: invalid move");
             return -1;
         }
-        setBoard(newBoard);
 
-        newBoard = moveBit(white, from, to, moves);
-        if(newBoard == 0L) {
+        if(newWhite == 0L) {
             System.err.println("error: could not set white bitboard");
             return -1;
         }
-        setWhite(newBoard);
+        setBoard(newBoard);
+        setWhite(newWhite);
         return 0;
     }
 
