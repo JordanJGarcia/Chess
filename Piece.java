@@ -22,63 +22,68 @@ class Piece {
 
     // constructor
     Piece() {
-        this.setNumMoves(-1);
-        this.setPosition(-1);
-        this.setType(Type.NON);
-        this.setOrientation(Orientation.NON);
+        setNumMoves(-1);
+        setPosition(-1);
+        setType(Type.NON);
+        setOrientation(Orientation.NON);
     }
     
     // constructor
     Piece(int p, Orientation o, Type t) {
-        this.setNumMoves(0);
-        this.setPosition(p);
-        this.setType(t);
-        this.setOrientation(o);
+        setNumMoves(0);
+        setPosition(p);
+        setType(t);
+        setOrientation(o);
     }
     
     int getPosition() {
-        return this.position;
+        return position;
     }
     
     void setPosition(int p) {
-        this.position = p;
+        position = p;
     }   
 
     @Override public String toString() {
-        return("\n" + this.getOrientation() + " " + this.getType() + ": " + this.getPosition());
-//        return("\nType: " + this.getType()
-//               + "\nColor: " + this.getPieceColor()
-//               + "\nPosition: " + this.getPosition()
-//               + "\nNumber of moves: " + this.getNumMoves());
+        return("\n" + getOrientation() + " " + getType() + ": " + getPosition());
+//        return("\nType: " + getType()
+//               + "\nColor: " + getPieceColor()
+//               + "\nPosition: " + getPosition()
+//               + "\nNumber of moves: " + getNumMoves());
     }
 
     int getNumMoves() {
-        return this.numMoves;
+        return numMoves;
     }
     
     void incrementNumMoves() {
-           this.numMoves++; 
+           numMoves++; 
     }
 
     void setNumMoves( int n ) {
-        this.numMoves = n;
+        numMoves = n;
     }
 
     Orientation getOrientation() {
-        return this.orientation;
+        return orientation;
     }
 
     void setOrientation(Orientation o) {
-        this.orientation = o;
+        orientation = o;
     }
     
     Type getType() {
-        return this.type;
+        return type;
     }
 
     void setType(Type t) {
-        this.type = t;
+        type = t;
     }
+
+    void updatePiece(int pos) {
+        setPosition(pos);
+        incrementNumMoves();
+    };
 
     public static void main(String[] args) {
         Piece non = new Piece(-1, Orientation.NON, Type.NON);
@@ -108,7 +113,7 @@ class Pawn extends Piece
 {
 //    @Override
 //    String toString() {
-//        //return ( this.color() == 0 ? "\u265f" : "\u2659" );
+//        //return ( color() == 0 ? "\u265f" : "\u2659" );
 //        //return "\u2659";
 //        return("
 //    }
@@ -129,7 +134,7 @@ class Rook extends Piece
 {
 //    @Override
 //    String toString() {
-//        //return ( this.color() == 0 ? "\u265c" : "\u2656" );
+//        //return ( color() == 0 ? "\u265c" : "\u2656" );
 //        return "\u2656";
 //    }
         
@@ -147,7 +152,7 @@ class Bishop extends Piece
 {
 //    @Override
 //    String toString() {
-//        //return ( this.color() == 0 ? "\u265d" : "\u2657" );
+//        //return ( color() == 0 ? "\u265d" : "\u2657" );
 //        return "\u2657";
 //    }
         
@@ -166,7 +171,7 @@ class Knight extends Piece
 {
 //    @Override
 //    String toString() {
-//        // return ( this.color() == 0 ? "\u265e" : "\u2658" );
+//        // return ( color() == 0 ? "\u265e" : "\u2658" );
 //        return "\u2658";
 //    }
         
@@ -186,7 +191,7 @@ class Queen extends Piece
 {
 //    @Override
 //    String toString() {
-//        // return ( this.color() == 0 ? "\u265b" : "\u2655" );
+//        // return ( color() == 0 ? "\u265b" : "\u2655" );
 //        return "\u2655";
 //    }
         
@@ -205,7 +210,7 @@ class King extends Piece
 {
 //    @Override
 //    String toString() {
-//        //return ( this.color() == 0 ? "\u265a" : "\u2654" );
+//        //return ( color() == 0 ? "\u265a" : "\u2654" );
 //        return "\u2654"; 
 //    }
 
