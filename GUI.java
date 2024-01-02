@@ -31,6 +31,7 @@ class GUI {
         frame.getContentPane().add(BorderLayout.CENTER, bp);
 
         // display GUI
+        frame.setSize( 1100, 800 );
         frame.setVisible(true);
     }
 
@@ -61,6 +62,7 @@ class BoardPanel extends JPanel implements ActionListener {
 
     private final int AMOUNT = 64;
     private int lastClicked;
+    private long availableMoves;
     
     private Board board;
 
@@ -90,6 +92,14 @@ class BoardPanel extends JPanel implements ActionListener {
         return lastClicked;
     }
 
+    void setAvailableMoves(long l) {
+        availableMoves = l;
+    }
+
+    long getAvailableMoves() {
+        return availableMoves;
+    }
+
     void setBoard(Board b) {
         board = b;
     }
@@ -98,10 +108,8 @@ class BoardPanel extends JPanel implements ActionListener {
         return board;
     }
 
-
     //functions to create/reset the board
     void createBoard() {
-        LineBorder lb = new LineBorder(Color.WHITE, 0);
         int row = 0;
 
         for(int i = 0; i < AMOUNT; i++) {
@@ -117,23 +125,25 @@ class BoardPanel extends JPanel implements ActionListener {
     }
     
     void resetBoard() {
-        LineBorder lb = new LineBorder(Color.WHITE, 0);
         int row = 0;
 
-        // set base formatting
         for(int i = 0; i < AMOUNT; i++) {
-            square[i].setBorder(lb);
             square[i].setOpaque(true);
+            square[i].setText("");
 
             // new row
             if(i % 8 == 0)
                 row++;
 
             // set color
-            if(i % 2 == 0)
+            if(i % 2 == 0) {
                 square[i].setBackground(row % 2 != 0 ? white : black);
-            else
+                square[i].setBorder(new LineBorder(row % 2 != 0 ? white : black));
+            }
+            else {
                 square[i].setBackground(row % 2 != 0 ? black : white);
+                square[i].setBorder(new LineBorder(row % 2 != 0 ? black : white));
+            }
         }
         
         // set pieces
@@ -151,21 +161,59 @@ class BoardPanel extends JPanel implements ActionListener {
     // action listener for the squares
     public void actionPerformed(ActionEvent e) {
 
-        resetBoard();
-        
         SquareButton s = (SquareButton)e.getSource();
 
         // check if we clicked same square twice
         if(getLastClicked() == s.getPosition()) {
             setLastClicked(-1);
+            setAvailableMoves(0L);
+            resetBoard();
             return;
         }
 
-        // highlight square
-        LineBorder lb = new LineBorder(Color.RED);
-        s.setBorder(lb);
+        // if we clicked an available move, request to move there
+        if(getBoard().getBitBoard().getBitValue(getAvailableMoves(), s.getPosition()) == 1) {
+            // if move is successful
+            if(getBoard().getCurrentPlayer().requestMove(getLastClicked(), s.getPosition()) != -1) {
 
+                // reset meta data
+                setLastClicked(-1);
+                setAvailableMoves(0L);
+
+                // switch players
+                getBoard().switchPlayers();
+
+                // reset board
+                resetBoard();
+                return;
+            }
+        }
+
+        // reset the board
+        resetBoard();
+
+        // square highlights
+        LineBorder selected = new LineBorder(getBoard().getCurrentPlayer() == getBoard().getPlayerOne() ? whitePiece : blackPiece);
+        Color option = new Color(134, 226, 116);
+
+        // hightlight selected
+        s.setBorder(selected);
+
+        // record last clicked
         setLastClicked(s.getPosition());
+
+        // get available moves for piece
+        setAvailableMoves(getBoard().getCurrentPlayer().getMovesAt(s.getPosition()));
+
+        // if no moves, do nothing
+        if(getAvailableMoves() == 0L)
+            return;
+
+        // show available moves
+        for(int i = 0; i < AMOUNT; i++) {
+            if(getBoard().getBitBoard().getBitValue(getAvailableMoves(), i) == 1)
+                square[i].setBackground(option);
+        }
     }
 }
 
