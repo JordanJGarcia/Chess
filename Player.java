@@ -4,20 +4,26 @@ import java.util.*;
 import java.awt.*;
 
 class Player {
+    private final boolean WHITE = true, BLACK = false;
 
-    private Orientation or;
+    private boolean side; // WHITE (true) or BLACK (false)
+
     private Piece piece[] = new Piece[16];
     private BitBoard bb; // each player has a copy of the bb that gets updated
 
-
-    // default constructor 
-    Player() {
-        // do nothing, idk if this is a good idea
-    }
+    // hold masks for available moves for each position
+    // sort of a hash table that will be updated as pieces move
+    private long[] moves;
 
     // constructor
-    Player(Orientation o, BitBoard b) {
-        setOrientation(o);
+    Player(boolean s, BitBoard b) {
+        moves = new long[64];
+
+        // initialize moves hash map
+        for(int i = 0; i < moves.length; i++)
+            moves[i] = 0L;
+
+        setSide(s);
         setBitBoard(b);
         setPlayerPieces();
     }
@@ -26,12 +32,12 @@ class Player {
     /* setters/getters for class attributes */
     /*--------------------------------------*/
 
-    Orientation getOrientation() {
-        return or;
+    boolean getSide() {
+        return side;
     }
 
-    void setOrientation(Orientation o) {
-        or = o;
+    void setSide(boolean s) {
+        side = s;
     }
 
     BitBoard getBitBoard() {
@@ -45,28 +51,46 @@ class Player {
     void setPlayerPieces() {
         int i, j;
 
-        if(getOrientation() == Orientation.WHITE)
+        if(getSide() == WHITE)
             i = 48;
         else
             i = 8;
 
         // place pawns on second row
-        for(j = 0; j < 8; j++, i++)
-            piece[j] = new Pawn(i, getOrientation());
+        for(j = 0; j < 8; j++, i++) {
+            piece[j] = new Pawn(i, getSide(), getBitBoard());
+            moves[i] = piece[j].getMoves();
+        }
 
-        // if black, non-pawn pieces get placed behind
-        if(getOrientation() == Orientation.BLACK)
+        // if BLACK, non-pawn pieces get placed behind
+        if(getSide() == BLACK)
             i = 0;
 
         // place non-pawn pieces
-        piece[j++] = new Rook(i++, getOrientation());
-        piece[j++] = new Knight(i++, getOrientation());
-        piece[j++] = new Bishop(i++, getOrientation());
-        piece[j++] = new Queen(i++, getOrientation());
-        piece[j++] = new King(i++, getOrientation());
-        piece[j++] = new Bishop(i++, getOrientation());
-        piece[j++] = new Knight(i++, getOrientation());
-        piece[j++] = new Rook(i++, getOrientation());
+        piece[j] = new Rook(i, getSide(), getBitBoard());
+        moves[i++] = piece[j++].getMoves();
+
+        piece[j] = new Knight(i, getSide(), getBitBoard());
+        moves[i++] = piece[j++].getMoves();
+
+        piece[j] = new Bishop(i, getSide(), getBitBoard());
+        moves[i++] = piece[j++].getMoves();
+
+        piece[j] = new Queen(i, getSide(), getBitBoard());
+        moves[i++] = piece[j++].getMoves();
+
+        piece[j] = new King(i, getSide(), getBitBoard());
+        moves[i++] = piece[j++].getMoves();
+
+        piece[j] = new Bishop(i, getSide(), getBitBoard());
+        moves[i++] = piece[j++].getMoves();
+
+        piece[j] = new Knight(i, getSide(), getBitBoard());
+        moves[i++] = piece[j++].getMoves();
+
+        piece[j] = new Rook(i, getSide(), getBitBoard());
+        moves[i++] = piece[j++].getMoves();
+
     }
 
     Piece[] getPieces() {
@@ -74,7 +98,7 @@ class Player {
     }
 
     @Override public String toString() {
-        return("Player: " + getOrientation());
+        return("Player: " + getSide());
     }
 
     void printPlayerData() {
@@ -83,7 +107,7 @@ class Player {
             System.out.print(p.toString());
 
         System.out.println("");
-        System.out.println("player " + or + " bitboard: ");
+        System.out.println("player " + (side == WHITE ? "WHITE" : "BLACK") + " bitboard: ");
         bb.printBitBoard();
     }
 
@@ -92,50 +116,26 @@ class Player {
     /*--------------------------------------*/
 
     int requestMove(int from, int to) {
-        long validMoves = 0L;
-        Piece p = null;
 
-        for(Piece t : piece) {
-            if(t.getPosition() == from)
-                p = t;
-        }
+        if(getSide() == BLACK) {
+            if(getBitBoard().playForBlack(moves[from], from, to) == -1)
+                return -1;
+        } 
 
-        if(p == null)
+        if(getBitBoard().playForWhite(moves[from], from, to) == -1)
             return -1;
 
-        switch(p.getType()) {
-            case PAWN:
-                validMoves = bb.getPawnMoves(from, or, p.getNumMoves() == 0);
-                break;
-            case ROOK:
-                validMoves = bb.getRookMoves(from, or);
-                break;
-            case BISHOP:
-                validMoves = bb.getBishopMoves(from, or);
-                break;
-            case KNIGHT:
-                validMoves = bb.getKnightMoves(from, or);
-                break;
-            case QUEEN:
-                validMoves = bb.getQueenMoves(from, or);
-                break;
-            case KING:
-                validMoves = bb.getKingMoves(from, or);
-                break;
-            default:
-                break;
+        // update hash table
+        moves[from] = 0L;
+            
+        // update piece and record moves in hash table
+        for(Piece p : piece) {
+            if(p.getPosition() == from) {
+                p.updatePiece(to);
+                moves[to] = p.getMoves();
+            }
         }
-
-       if(or == Orientation.BLACK) {
-           if(bb.playForBlack(validMoves, from, to) == -1)
-               return -1;
-       } 
-
-       if(bb.playForWhite(validMoves, from, to) == -1)
-           return -1;
-
-       p.updatePiece(to);
-       return 0;
+        return 0;
     }
 
 

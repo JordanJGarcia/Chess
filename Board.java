@@ -4,6 +4,7 @@ import java.util.*;
 import java.awt.*;
 
 class Board {
+    private final boolean WHITE = true, BLACK = false;
     // the idea is for Board to be the 2nd tier encompassing class
     //      - A board will have an underlying bitboard, shared by 2 players, each player has 16 pieces, etc.
     //      - a GUI will have an underlying board that it sends requests to and portrays on the screen
@@ -13,8 +14,8 @@ class Board {
     // default constructor
     Board() {
         bb = new BitBoard();
-        p1 = new Player(Orientation.WHITE, bb);
-        p2 = new Player(Orientation.BLACK, bb);
+        p1 = new Player(WHITE, bb);
+        p2 = new Player(BLACK, bb);
     }
 
     // constructor

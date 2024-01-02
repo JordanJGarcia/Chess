@@ -167,12 +167,12 @@ class BitBoard {
     // the below functions will generate masks of available moves for each piece
 
     // PAWN
-    long getPawnMoves(int pos, Orientation or, boolean firstMove) {
+    long getPawnMoves(int pos, boolean s, boolean firstMove) {
         long openMoves = 0L;
-        long opponent = (or == Orientation.WHITE ? black : white);
+        long opponent = (s == true ? black : white);
         int loc;
 
-        if(or == Orientation.WHITE) {
+        if(s == true) {
             loc = pos - 8;
             if(getBitValue(board, loc) == 0) {
                 openMoves = masks[loc];
@@ -212,10 +212,10 @@ class BitBoard {
     }
 
     // ROOK
-    long getRookMoves(int pos, Orientation or) {
+    long getRookMoves(int pos, boolean s) {
         long openMoves = 0L;
-        long opponent = (or == Orientation.WHITE ? black : white);
-        long me = (or == Orientation.WHITE ? white : black);
+        long opponent = (s == true ? black : white);
+        long me = (s == true ? white : black);
         int i;
 
         // open moves to the right (white) or left (black)
@@ -277,80 +277,67 @@ class BitBoard {
     }
 
     // BISHOP
-    long getBishopMoves(int pos, Orientation or) {
+    long getBishopMoves(int pos, boolean s) {
         long openMoves = 0L;
-        long opponent = (or == Orientation.WHITE ? black : white);
-        long me = (or == Orientation.WHITE ? white : black);
-        int i;
+        long opponent = (s == true ? black : white);
+        long me = (s == true ? white : black);
 
         // open moves up-right (white) or down-left (black)
-        i = pos;
-        while(i % 8 != 7) {
-            i -= 7;
-            if(i >= 0) {
-                if(getBitValue(me, i) == 0) {
-                    if(getBitValue(opponent, i) == 1) {
-                        openMoves |= masks[i];
-                        break;
-                    }
-                    openMoves |= masks[i];
-                }
-                else break;
+        for(int i = pos; i % 8 != 7; i -= 7) {
+            if(i < 0 || i > 64)
+                break;
+
+            if(getBitValue(me, i) == 0) {
+                openMoves |= masks[i];
+                if(getBitValue(opponent, i) == 1)
+                    break;
             }
+            else break;
         }
 
         // open moves up-left (white) or down-right (black)
-        i = pos;
-        while(i % 8 != 0) {
-            i -= 9;
-            if(i >= 0) {
-                if(getBitValue(me, i) == 0) {
-                    if(getBitValue(opponent, i) == 1) {
-                        openMoves |= masks[i];
-                        break;
-                    }
-                    openMoves |= masks[i];
-                }
-                else break;
+        for(int i = pos; i % 8 != 0; i -= 9) {
+            if(i < 0 || i > 64)
+                break;
+
+            if(getBitValue(me, i) == 0) {
+                openMoves |= masks[i];
+                if(getBitValue(opponent, i) == 1)
+                    break;
             }
+            else break;
         }
 
         // open moves down-right (white) or up-left (black)
-        i = pos;
-        while(i % 8 != 7) {
-            i += 9;
-            if(i < 64) {
-                if(getBitValue(me, i) == 0) {
-                    if(getBitValue(opponent, i) == 1) {
-                        openMoves |= masks[i];
-                        break;
-                    }
-                    openMoves |= masks[i];
-                }
-                else break;
+        for(int i = pos; i % 8 != 7; i += 9) {
+            if(i < 0 || i > 64)
+                break;
+
+            if(getBitValue(me, i) == 0) {
+                openMoves |= masks[i];
+                if(getBitValue(opponent, i) == 1)
+                    break;
             }
+            else break;
         }
 
         // open moves down-left (white) or up-right (black)
-        i = pos;
-        while(i % 8 != 0) {
-            i += 7;
-            if(i < 64) {
-                if(getBitValue(me, i) == 0) {
-                    if(getBitValue(opponent, i) == 1) {
-                        openMoves |= masks[i];
-                        break;
-                    }
-                    openMoves |= masks[i];
-                }
-                else break;
+        for(int i = pos; i % 8 != 0; i += 7) {
+            if(i < 0 || i > 64)
+                break;
+
+            if(getBitValue(me, i) == 0) {
+                openMoves |= masks[i];
+                if(getBitValue(opponent, i) == 1)
+                    break;
             }
+            else break;
         }
         return openMoves;
     }
 
     // KNIGHT
-    long getKnightMoves(int pos, Orientation or) {
+    long getKnightMoves(int pos, boolean s) {
         long openMoves = 0L;
         int[] val = {6, 10, 15, 17}; // all positions knight can move (up or down from current pos)
         int loc;
@@ -376,27 +363,27 @@ class BitBoard {
             }
         }
 
-        if(or == Orientation.WHITE)
+        if(s == true)
             return openMoves & ~white;
 
         return openMoves & ~black;
     }
 
     // QUEEN
-    long getQueenMoves(int pos, Orientation or) {
+    long getQueenMoves(int pos, boolean s) {
         long openMoves = 0L;
 
-        openMoves |= getRookMoves(pos, or);
-        openMoves |= getBishopMoves(pos, or);
+        openMoves |= getRookMoves(pos, s);
+        openMoves |= getBishopMoves(pos, s);
 
         return openMoves;
     }
 
     // KING
-    long getKingMoves(int pos, Orientation or) {
+    long getKingMoves(int pos, boolean s) {
         long openMoves = 0L;
-        long opponent = (or == Orientation.WHITE ? black : white);
-        long me = (or == Orientation.WHITE ? white : black);
+        long opponent = (s == true ? black : white);
+        long me = (s == true ? white : black);
         int[] val = {1, 7, 8, 9};
         int loc, offset;
 
@@ -419,8 +406,8 @@ class BitBoard {
     }
 
     // generate available attacks for a piece
-    long getAttacks(long moves, Orientation or) {
-        long opponent = (or == Orientation.WHITE ? black : white);
+    long getAttacks(long moves, boolean s) {
+        long opponent = (s == true ? black : white);
         return moves & opponent;
     }
 
@@ -431,13 +418,13 @@ class BitBoard {
         BitBoard bb =  new BitBoard();
 
         // play for black
-        long validMoves = bb.getPawnMoves(8, Orientation.BLACK, true);
+        long validMoves = bb.getPawnMoves(8, false, true);
         bb.playForBlack(validMoves, 8, 24);
         bb.printBitBoard();
         bb.print(bb.getBlack());
 
         // play for white
-        validMoves = bb.getPawnMoves(52, Orientation.WHITE, true);
+        validMoves = bb.getPawnMoves(52, true, true);
         bb.playForWhite(validMoves, 52, 36);
         bb.printBitBoard();
         bb.print(bb.getWhite());
