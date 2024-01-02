@@ -13,11 +13,8 @@ import java.awt.event.ActionEvent;
 //      a single board, and within the board is:
 //          2 players with their pieces, and a bitboard (shared by both players)
 class GUI {
-    private Board board;
 
     GUI() {
-        board = new Board();
-
         // create the frame
         JFrame frame = new JFrame("Chess");
 
@@ -35,18 +32,6 @@ class GUI {
 
         // display GUI
         frame.setVisible(true);
-    }
-
-    GUI(Board b) {
-        setBoard(b);
-    }
-
-    void setBoard(Board b) {
-        board = b;
-    }
-
-    Board getBoard() {
-        return board;
     }
 
 
@@ -76,17 +61,21 @@ class BoardPanel extends JPanel implements ActionListener {
 
     private final int AMOUNT = 64;
     private int lastClicked;
+    
+    private Board board;
 
     // squares on the board
     private SquareButton[] square = new SquareButton[AMOUNT];
     private GridLayout gl = new GridLayout(8, 8);
 
     // colors of the board
-    static Color tan = new Color( 119,136,153 );
-    static Color black = Color.WHITE;
-    static Color grey = new Color( 57, 55, 55 );
+    static Color black = new Color( 119,136,153 );
+    static Color white = Color.WHITE;
+    static Color whitePiece = new Color( 255,200,113 );
+    static Color blackPiece = Color.BLACK;
 
     BoardPanel() {
+        board = new Board();
         setLayout(gl);
         createBoard();
         setLastClicked(-1);
@@ -100,6 +89,15 @@ class BoardPanel extends JPanel implements ActionListener {
     int getLastClicked() {
         return lastClicked;
     }
+
+    void setBoard(Board b) {
+        board = b;
+    }
+
+    Board getBoard() {
+        return board;
+    }
+
 
     //functions to create/reset the board
     void createBoard() {
@@ -122,6 +120,7 @@ class BoardPanel extends JPanel implements ActionListener {
         LineBorder lb = new LineBorder(Color.WHITE, 0);
         int row = 0;
 
+        // set base formatting
         for(int i = 0; i < AMOUNT; i++) {
             square[i].setBorder(lb);
             square[i].setOpaque(true);
@@ -132,9 +131,20 @@ class BoardPanel extends JPanel implements ActionListener {
 
             // set color
             if(i % 2 == 0)
-                square[i].setBackground(row % 2 != 0 ? black : tan);
+                square[i].setBackground(row % 2 != 0 ? white : black);
             else
-                square[i].setBackground(row % 2 != 0 ? tan : black);
+                square[i].setBackground(row % 2 != 0 ? black : white);
+        }
+        
+        // set pieces
+        for(Piece p : getBoard().getPlayerOne().getPieces()) {
+            square[p.getPosition()].setText(p.toString());
+            square[p.getPosition()].setForeground(whitePiece);
+        }
+
+        for(Piece p : getBoard().getPlayerTwo().getPieces()) {
+            square[p.getPosition()].setText(p.toString());
+            square[p.getPosition()].setForeground(blackPiece);
         }
     }
 
@@ -166,10 +176,12 @@ class SquareButton extends JButton {
 
     SquareButton() {
         setPosition(-1);
+        setFont(new Font("Serif Plain", Font.BOLD, 50));
     }
 
     SquareButton(int pos) {
         setPosition(pos);
+        setFont(new Font("Serif Plain", Font.BOLD, 50));
     }
 
     // setters/getters
