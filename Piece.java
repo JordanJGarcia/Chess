@@ -83,10 +83,6 @@ class Piece {
         setPosition(pos);
         incrementNumMoves();
     };
-
-    public static void main(String[] args) {
-
-    }
 }
 
 class Pawn extends Piece

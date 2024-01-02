@@ -73,11 +73,4 @@ class Board {
         else
             setCurrentPlayer(getPlayerOne());
     }
-
-    public static void main(String[] args) {
-        Board board = new Board();
-        board.printPlayerData();
-        System.out.println("request status (WHITE): " + board.getPlayerOne().requestMove(48, 32));
-        board.printPlayerData();
-    }
 }

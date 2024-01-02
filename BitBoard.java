@@ -381,25 +381,4 @@ class BitBoard {
         long opponent = (s == true ? black : white);
         return moves & opponent;
     }
-
-
-
-    // main
-    public static void main(String[] args) {
-        BitBoard bb =  new BitBoard();
-
-        bb.print(bb.getRookMoves(47, true));
-        bb.print(bb.getBishopMoves(20, false));
-        // play for black
-//        long validMoves = bb.getPawnMoves(8, false, true);
-//        bb.playForBlack(validMoves, 8, 24);
-//        bb.printBitBoard();
-//        bb.print(bb.getBlack());
-//
-//        // play for white
-//        validMoves = bb.getPawnMoves(52, true, true);
-//        bb.playForWhite(validMoves, 52, 36);
-//        bb.printBitBoard();
-//        bb.print(bb.getWhite());
-    }
 }
