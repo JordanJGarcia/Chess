@@ -44,10 +44,6 @@ class Piece {
         position = p;
     }   
 
-    @Override public String toString() {
-        return("\n" + getOrientation() + " " + getType() + ": " + getPosition());
-    }
-
     int getNumMoves() {
         return numMoves;
     }
@@ -107,12 +103,10 @@ class Piece {
 
 class Pawn extends Piece
 {
-//    @Override
-//    String toString() {
-//        //return ( color() == 0 ? "\u265f" : "\u2659" );
-//        //return "\u2659";
-//        return("
-//    }
+    @Override
+    public String toString() {
+        return ( getOrientation() == Orientation.WHITE ? "\u2659" : "\u265f" );
+    }
 
     Pawn() {
         super();
@@ -128,11 +122,10 @@ class Pawn extends Piece
 
 class Rook extends Piece
 {
-//    @Override
-//    String toString() {
-//        //return ( color() == 0 ? "\u265c" : "\u2656" );
-//        return "\u2656";
-//    }
+    @Override
+    public String toString() {
+        return ( getOrientation() == Orientation.WHITE ? "\u2656" : "\u265c" );
+    }
         
     Rook() {
         super();
@@ -146,11 +139,10 @@ class Rook extends Piece
 
 class Bishop extends Piece
 {
-//    @Override
-//    String toString() {
-//        //return ( color() == 0 ? "\u265d" : "\u2657" );
-//        return "\u2657";
-//    }
+    @Override
+    public String toString() {
+        return ( getOrientation() == Orientation.WHITE ? "\u2657" : "\u265d" );
+    }
         
     Bishop() {
            super();
@@ -165,11 +157,10 @@ class Bishop extends Piece
 
 class Knight extends Piece
 {
-//    @Override
-//    String toString() {
-//        // return ( color() == 0 ? "\u265e" : "\u2658" );
-//        return "\u2658";
-//    }
+    @Override
+    public String toString() {
+        return ( getOrientation() == Orientation.WHITE ? "\u2658" : "\u265e" );
+    }
         
     Knight() {
         super();
@@ -185,11 +176,10 @@ class Knight extends Piece
 
 class Queen extends Piece
 {
-//    @Override
-//    String toString() {
-//        // return ( color() == 0 ? "\u265b" : "\u2655" );
-//        return "\u2655";
-//    }
+    @Override
+    public String toString() {
+        return ( getOrientation() == Orientation.WHITE ? "\u2655" : "\u265b" );
+    }
         
     Queen() {
         super();
@@ -204,11 +194,10 @@ class Queen extends Piece
 
 class King extends Piece
 {
-//    @Override
-//    String toString() {
-//        //return ( color() == 0 ? "\u265a" : "\u2654" );
-//        return "\u2654"; 
-//    }
+    @Override
+    public String toString() {
+        return ( getOrientation() == Orientation.WHITE ? "\u2654" : "\u265a" );
+    }
 
     King() {
         super();
