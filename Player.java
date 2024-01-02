@@ -32,6 +32,13 @@ class Player {
     /* setters/getters for class attributes */
     /*--------------------------------------*/
 
+    long getMovesAt(int pos) {
+        if(pos < 0 || pos > 63)
+            return 0L;
+
+        return moves[pos];
+    }
+
     boolean getSide() {
         return side;
     }
@@ -121,26 +128,21 @@ class Player {
             if(getBitBoard().playForBlack(moves[from], from, to) == -1)
                 return -1;
         } 
+        else {
+            if(getBitBoard().playForWhite(moves[from], from, to) == -1)
+                return -1;
+        }
 
-        if(getBitBoard().playForWhite(moves[from], from, to) == -1)
-            return -1;
-
-        // update hash table
+        // clear hash entry
         moves[from] = 0L;
             
-        // update piece and record moves in hash table
+        // update piece and hash table
         for(Piece p : piece) {
-            if(p.getPosition() == from) {
+            if(p.getPosition() == from)
                 p.updatePiece(to);
-                moves[to] = p.getMoves();
-            }
+
+            moves[p.getPosition()] = p.getMoves();
         }
         return 0;
-    }
-
-
-
-    public static void main(String[] args) {
-        System.out.println("in main() for Player.java");
     }
 }
