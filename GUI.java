@@ -194,6 +194,7 @@ class BoardPanel extends JPanel implements ActionListener {
 
     // display available moves for a piece
     void displayMoves(int pos) {
+        getBoard().getCurrentPlayer().updateMoves();
         setAvailableMoves(getBoard().getCurrentPlayer().getMovesAt(pos));
         Color c = new Color(134, 226, 116);
 

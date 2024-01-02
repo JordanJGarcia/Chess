@@ -39,6 +39,11 @@ class Player {
         return moves[pos];
     }
 
+    void updateMoves() {
+        for(Piece p : piece)
+            moves[p.getPosition()] = p.getMoves();
+    }
+
     boolean getSide() {
         return side;
     }
@@ -110,11 +115,8 @@ class Player {
 
     void printPlayerData() {
         System.out.println(toString());
-        for(Piece p : piece)
-            System.out.print(p.toString());
-
         System.out.println("");
-        System.out.println("player " + (side == WHITE ? "WHITE" : "BLACK") + " bitboard: ");
+        System.out.println("board: ");
         bb.printBitBoard();
     }
 
@@ -136,13 +138,12 @@ class Player {
         // clear hash entry
         moves[from] = 0L;
             
-        // update piece and hash table
+        // update piece
         for(Piece p : piece) {
             if(p.getPosition() == from)
                 p.updatePiece(to);
-
-            moves[p.getPosition()] = p.getMoves();
         }
+
         return 0;
     }
 }
