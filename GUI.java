@@ -170,8 +170,8 @@ class BoardPanel extends JPanel implements ActionListener {
     }
 
     // check if user chose a valid move
-    boolean validMove(int pos) {
-        return getBoard().getBitBoard().getBitValue(getAvailableMoves() ,pos) == 1;
+    boolean validMove(long mask, int pos) {
+        return getBoard().getBitBoard().getBitValue(mask ,pos) == 1;
     }
 
     // attempt to move a piece
@@ -196,17 +196,24 @@ class BoardPanel extends JPanel implements ActionListener {
     void displayMoves(int pos) {
         getBoard().getCurrentPlayer().updateMoves();
         setAvailableMoves(getBoard().getCurrentPlayer().getMovesAt(pos));
-        Color c = new Color(134, 226, 116);
+
+        Color m = new Color(134, 226, 116);
+        Color a = new Color(181, 101, 104);
 
         if(getAvailableMoves() == 0L)
             return;
 
+        long attacks = getBoard().getBitBoard().getAttacks(getAvailableMoves(), getBoard().getCurrentPlayer().getSide());
+
         for(int i = 0; i < AMOUNT; i++) {
-            if(getBoard().getBitBoard().getBitValue(getAvailableMoves(), i) == 1)
-                square[i].setBackground(c);
+            if(validMove(attacks, i))
+                square[i].setBackground(a);
+            else {
+                if(validMove(getAvailableMoves(), i))
+                    square[i].setBackground(m);
+            }
         }
     }
-
 
     // action listener for the squares
     public void actionPerformed(ActionEvent e) {
@@ -216,7 +223,7 @@ class BoardPanel extends JPanel implements ActionListener {
         if(clickedSameSquare(s.getPosition()))
             return;
 
-        if(validMove(s.getPosition())) {
+        if(validMove(getAvailableMoves(), s.getPosition())) {
             if(attemptMove(s.getPosition()))
                 return;
         }
