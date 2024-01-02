@@ -3,6 +3,11 @@ package chess;
 import javax.swing.*;
 import java.awt.*;
 
+import javax.swing.border.LineBorder;
+
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+
 // a GUI will be the tier 1 encompassing class of the other objects in this package
 // it will contain the following:
 //      a single board, and within the board is:
@@ -67,11 +72,90 @@ class MessagePanel extends JPanel {
 
 
 // JPanel representing the board
-class BoardPanel extends JPanel {
-    private final int ROWS = 8, COLS = 8;
+class BoardPanel extends JPanel implements ActionListener {
+
+    private final int AMOUNT = 64;
+    private int lastClicked;
+
+    // squares on the board
+    private SquareButton[] square = new SquareButton[AMOUNT];
+    private GridLayout gl = new GridLayout(8, 8);
+
+    // colors of the board
+    static Color tan = new Color( 119,136,153 );
+    static Color black = Color.WHITE;
+    static Color grey = new Color( 57, 55, 55 );
 
     BoardPanel() {
-        System.out.println("In BoardPanel() constructor");
+        setLayout(gl);
+        createBoard();
+        setLastClicked(-1);
+    }
+
+    // setters/getters
+    void setLastClicked(int pos) {
+        lastClicked = pos;
+    }
+
+    int getLastClicked() {
+        return lastClicked;
+    }
+
+    //functions to create/reset the board
+    void createBoard() {
+        LineBorder lb = new LineBorder(Color.WHITE, 0);
+        int row = 0;
+
+        for(int i = 0; i < AMOUNT; i++) {
+            square[i] = new SquareButton(i);
+
+            // add to panel
+            add(square[i]);
+
+            // add action listener
+            square[i].addActionListener(this);
+        }
+        resetBoard();
+    }
+    
+    void resetBoard() {
+        LineBorder lb = new LineBorder(Color.WHITE, 0);
+        int row = 0;
+
+        for(int i = 0; i < AMOUNT; i++) {
+            square[i].setBorder(lb);
+            square[i].setOpaque(true);
+
+            // new row
+            if(i % 8 == 0)
+                row++;
+
+            // set color
+            if(i % 2 == 0)
+                square[i].setBackground(row % 2 != 0 ? black : tan);
+            else
+                square[i].setBackground(row % 2 != 0 ? tan : black);
+        }
+    }
+
+    // action listener for the squares
+    public void actionPerformed(ActionEvent e) {
+
+        resetBoard();
+        
+        SquareButton s = (SquareButton)e.getSource();
+
+        // check if we clicked same square twice
+        if(getLastClicked() == s.getPosition()) {
+            setLastClicked(-1);
+            return;
+        }
+
+        // highlight square
+        LineBorder lb = new LineBorder(Color.RED);
+        s.setBorder(lb);
+
+        setLastClicked(s.getPosition());
     }
 }
 
@@ -82,7 +166,10 @@ class SquareButton extends JButton {
 
     SquareButton() {
         setPosition(-1);
-        System.out.println("In SquareButton() constructor");
+    }
+
+    SquareButton(int pos) {
+        setPosition(pos);
     }
 
     // setters/getters
