@@ -158,62 +158,79 @@ class BoardPanel extends JPanel implements ActionListener {
         }
     }
 
+    // check if user clicks same square twice
+    boolean clickedSameSquare(int pos) {
+        if(getLastClicked() != pos)
+            return false;
+
+        setLastClicked(-1);
+        setAvailableMoves(0L);
+        resetBoard();
+        return true;
+    }
+
+    // check if user chose a valid move
+    boolean validMove(int pos) {
+        return getBoard().getBitBoard().getBitValue(getAvailableMoves() ,pos) == 1;
+    }
+
+    // attempt to move a piece
+    boolean attemptMove(int pos) {
+        if(getBoard().getCurrentPlayer().requestMove(getLastClicked(), pos) == -1)
+            return false;
+
+        // reset data
+        setLastClicked(-1);
+        setAvailableMoves(0L);
+
+        // switch players
+        getBoard().switchPlayers();
+
+        // reset board
+        resetBoard();
+
+        return true;
+    }
+
+    // display available moves for a piece
+    void displayMoves(int pos) {
+        setAvailableMoves(getBoard().getCurrentPlayer().getMovesAt(pos));
+        Color c = new Color(134, 226, 116);
+
+        if(getAvailableMoves() == 0L)
+            return;
+
+        for(int i = 0; i < AMOUNT; i++) {
+            if(getBoard().getBitBoard().getBitValue(getAvailableMoves(), i) == 1)
+                square[i].setBackground(c);
+        }
+    }
+
+
     // action listener for the squares
     public void actionPerformed(ActionEvent e) {
 
         SquareButton s = (SquareButton)e.getSource();
 
-        // check if we clicked same square twice
-        if(getLastClicked() == s.getPosition()) {
-            setLastClicked(-1);
-            setAvailableMoves(0L);
-            resetBoard();
+        if(clickedSameSquare(s.getPosition()))
             return;
-        }
 
-        // if we clicked an available move, request to move there
-        if(getBoard().getBitBoard().getBitValue(getAvailableMoves(), s.getPosition()) == 1) {
-            // if move is successful
-            if(getBoard().getCurrentPlayer().requestMove(getLastClicked(), s.getPosition()) != -1) {
-
-                // reset meta data
-                setLastClicked(-1);
-                setAvailableMoves(0L);
-
-                // switch players
-                getBoard().switchPlayers();
-
-                // reset board
-                resetBoard();
+        if(validMove(s.getPosition())) {
+            if(attemptMove(s.getPosition()))
                 return;
-            }
         }
 
         // reset the board
         resetBoard();
 
-        // square highlights
-        LineBorder selected = new LineBorder(getBoard().getCurrentPlayer() == getBoard().getPlayerOne() ? whitePiece : blackPiece);
-        Color option = new Color(134, 226, 116);
-
-        // hightlight selected
-        s.setBorder(selected);
+        // highlight clicked square
+        s.setBorder(new LineBorder(getBoard().getCurrentPlayer() == getBoard().getPlayerOne() ? whitePiece : blackPiece));
 
         // record last clicked
         setLastClicked(s.getPosition());
 
-        // get available moves for piece
-        setAvailableMoves(getBoard().getCurrentPlayer().getMovesAt(s.getPosition()));
-
-        // if no moves, do nothing
-        if(getAvailableMoves() == 0L)
-            return;
-
         // show available moves
-        for(int i = 0; i < AMOUNT; i++) {
-            if(getBoard().getBitBoard().getBitValue(getAvailableMoves(), i) == 1)
-                square[i].setBackground(option);
-        }
+        displayMoves(s.getPosition());
     }
 }
 
