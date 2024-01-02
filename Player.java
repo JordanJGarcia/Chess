@@ -69,6 +69,10 @@ class Player {
         piece[j++] = new Rook(i++, getOrientation());
     }
 
+    Piece[] getPieces() {
+        return piece;
+    }
+
     @Override public String toString() {
         return("Player: " + getOrientation());
     }
