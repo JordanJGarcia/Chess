@@ -45,17 +45,11 @@ class BitBoard {
     // creates the initial board to play on
     void createBoard() {
         initializeWhiteBits();
-        System.out.println("\nWhite state: \n");
-        print(white);
-
         initializeBlackBits();
-        System.out.println("\nBlack state: \n");
-        print(black);
-
         board = black | white;
+
         System.out.println("\nBoard state: \n");
         print(board);
-        System.out.print("\n");
     }
 
     void initializeWhiteBits() {

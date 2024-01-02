@@ -16,74 +16,108 @@ enum Type {
 class Piece {
     protected final boolean WHITE = true, BLACK = false;
 
-    private int position;   // each piece has a position 0-63
+    // position in the board index
+    private int position;
+
+    // each piece has moved x amt of times
     private int numMoves;
+
+    // each piece has a type
     private Type type;
-    boolean side;           // white (true) or black (false)
-    private BitBoard bb;    // each piece will have a copy of the BitBoard to access
+
+    // each piece belongs to a player
+    boolean side;           
+
+    // each piece has a copy of the bitboard?
+    private BitBoard bb;
 
     // constructor
-    Piece(int p, Type t, boolean s, BitBoard b) {
-        setNumMoves(0);
-        setPosition(p);
+    Piece(Type t, int p, boolean s, BitBoard b) {
         setType(t);
+        setPosition(p);
         setSide(s);
         setBitBoard(b);
+        setNumMoves(0);
     }
-    
-    int getPosition() {
-        return position;
+
+    // non-piece constructor
+    Piece(Type t, int p) {
+        setType(t);
+        setPosition(p);
+        setSide(false);
+        setBitBoard(null);
+        setNumMoves(-1);
     }
     
     void setPosition(int p) {
         position = p;
     }   
 
-    int getNumMoves() {
-        return numMoves;
-    }
-    
-    void incrementNumMoves() {
-           numMoves++; 
-    }
-
     void setNumMoves(int n) {
         numMoves = n;
-    }
-
-    Type getType() {
-        return type;
     }
 
     void setType(Type t) {
         type = t;
     }
 
-    long getMoves() {
-        return 0L;
-    }
-
     void setSide(boolean b) {
         side = b;
     }
     
-    boolean getSide() {
-        return side;
-    }
-
     void setBitBoard(BitBoard b) {
         bb = b;
+    }
+
+    int getPosition() {
+        return position;
+    }
+    
+    int getNumMoves() {
+        return numMoves;
+    }
+    
+    Type getType() {
+        return type;
+    }
+
+    boolean getSide() {
+        return side;
     }
 
     BitBoard getBitBoard() {
         return bb;
     }
 
-    void updatePiece(int pos) {
-        setPosition(pos);
-        incrementNumMoves();
+    long getMoves() {
+        return 0L;
+    }
+
+    // move a piece on the board
+    void movePiece(int p) {
+        setPosition(p);
+        setNumMoves(getNumMoves() + 1);
     };
 }
+
+
+// represents no piece
+class Non extends Piece
+{
+    @Override
+    public String toString() {
+        return "";
+    }
+
+    Non(int p) {
+        super(Type.NON, p);
+    }
+
+    long getMoves() {
+        return 0L;
+    }
+}
+
 
 class Pawn extends Piece
 {
@@ -93,7 +127,7 @@ class Pawn extends Piece
     }
 
     Pawn(int p, boolean s, BitBoard b) {
-        super(p,Type.PAWN, s, b);
+        super(Type.PAWN, p, s, b);
     }
     
     long getMoves() {
@@ -111,7 +145,7 @@ class Rook extends Piece
     }
         
     Rook(int p, boolean s, BitBoard b) {
-        super(p,Type.ROOK, s, b);
+        super(Type.ROOK, p, s, b);
     }
     
     long getMoves() {
@@ -128,7 +162,7 @@ class Bishop extends Piece
     }
         
     Bishop(int p, boolean s, BitBoard b) {
-        super(p,Type.BISHOP, s, b);
+        super(Type.BISHOP, p, s, b);
     }
     
     long getMoves() {
@@ -145,7 +179,7 @@ class Knight extends Piece
     }
         
     Knight(int p, boolean s, BitBoard b) {
-        super(p,Type.KNIGHT, s, b);
+        super(Type.KNIGHT, p, s, b);
     }
     
     long getMoves() {
@@ -163,7 +197,7 @@ class Queen extends Piece
     }
         
     Queen(int p, boolean s, BitBoard b) {
-        super(p,Type.QUEEN, s, b);
+        super(Type.QUEEN, p, s, b);
     }
     
     long getMoves() {
@@ -180,7 +214,7 @@ class King extends Piece
     }
 
     King(int p, boolean s, BitBoard b) {
-        super(p,Type.KING, s, b);
+        super(Type.KING, p, s, b);
     }    
 
     long getMoves() {

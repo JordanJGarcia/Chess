@@ -49,24 +49,29 @@ class MessagePanel extends JPanel {
 
 // JPanel representing the board
 class BoardPanel extends JPanel implements ActionListener {
-
+    private final boolean WHITE = true, BLACK = false;
     private final int AMOUNT = 64;
+
+    // last clicked square
     private int last;
+
+    // moves and attacks for a piece
     private long moves, attacks;
     
+    // underlying board
     private Board board;
 
     // squares on the board
     private SquareButton[] square = new SquareButton[AMOUNT];
-
-    // layout of the BoardPanel
-    private GridLayout gl = new GridLayout(8, 8);
 
     // colors of the board
     static Color black = new Color(119,136,153);
     static Color white = Color.WHITE;
     static Color blackPiece = Color.BLACK;
     static Color whitePiece = new Color(255,200,113);
+
+    // layout of the BoardPanel
+    private GridLayout gl = new GridLayout(8, 8);
 
     BoardPanel() {
         setLayout(gl);
@@ -130,10 +135,14 @@ class BoardPanel extends JPanel implements ActionListener {
     
     void resetBoard() {
         int row = 0;
+        Piece[] boardIndex = getBoard().getIndex();
 
         for(int i = 0; i < AMOUNT; i++) {
             square[i].setOpaque(true);
-            square[i].setText("");
+            square[i].setText(boardIndex[i].toString());
+
+            if(boardIndex[i].getType() != Type.NON)
+                square[i].setForeground(boardIndex[i].getSide() == WHITE ? whitePiece : blackPiece);
 
             // new row
             if(i % 8 == 0)
@@ -147,21 +156,6 @@ class BoardPanel extends JPanel implements ActionListener {
             else {
                 square[i].setBackground(row % 2 != 0 ? black : white);
                 square[i].setBorder(new LineBorder(row % 2 != 0 ? black : white));
-            }
-        }
-        
-        // set pieces
-        for(Piece p : getBoard().getPlayerOne().getPieces()) {
-            if(p != null) {
-                square[p.getPosition()].setText(p.toString());
-                square[p.getPosition()].setForeground(whitePiece);
-            }
-        }
-
-        for(Piece p : getBoard().getPlayerTwo().getPieces()) {
-            if(p != null) {
-                square[p.getPosition()].setText(p.toString());
-                square[p.getPosition()].setForeground(blackPiece);
             }
         }
     }
@@ -184,12 +178,13 @@ class BoardPanel extends JPanel implements ActionListener {
 
     // attempt to move a piece
     boolean attemptMove(int pos) {
-        if(getBoard().getCurrentPlayer().requestMove(getLastClicked(), pos) == -1)
+        if(getBoard().requestMove(getLastClicked(), pos) == -1)
             return false;
 
         // reset data
         setLastClicked(-1);
         setMoves(0L);
+        setAttacks(0L);
 
         // switch players
         getBoard().switchPlayers();
@@ -202,8 +197,8 @@ class BoardPanel extends JPanel implements ActionListener {
 
     // display available moves for a piece
     void displayMoves(int pos) {
-        getBoard().getCurrentPlayer().updateMoves();
-        setMoves(getBoard().getCurrentPlayer().getMovesAt(pos));
+
+        setMoves(getBoard().getIndexAt(pos).getMoves());
         setAttacks(getBoard().getBitBoard().getAttacks(getMoves(), getBoard().getCurrentPlayer().getSide()));
 
         Color m = new Color(134, 226, 116);
@@ -244,7 +239,8 @@ class BoardPanel extends JPanel implements ActionListener {
         setLastClicked(s.getPosition());
 
         // show available moves
-        displayMoves(s.getPosition());
+        if(getBoard().getIndexAt(s.getPosition()).getSide() == getBoard().getCurrentPlayer().getSide())
+            displayMoves(s.getPosition());
     }
 }
 
