@@ -216,62 +216,45 @@ class BitBoard {
         long openMoves = 0L;
         long opponent = (s == true ? black : white);
         long me = (s == true ? white : black);
-        int i;
 
         // open moves to the right (white) or left (black)
-        i = pos;
-        while(i % 8 != 7) {
-            i++;
-            if(getBitValue(me, i) == 0) {
-                if(getBitValue(opponent, i) == 1) {
-                    openMoves |= masks[i];
-                    break;
-                }
+        for(int i = pos; i % 8 != 7 && i < 64 && i >= 0; i++) {
+            if(getBitValue(me, i) == 0)
                 openMoves |= masks[i];
-            }
             else break;
+
+            if(getBitValue(opponent, i) == 1)
+                break;
         }
 
         // open moves to the left (white) or right (black)
-        i = pos;
-        while(i % 8 != 0) {
-            i--;
-            if(getBitValue(me, i) == 0) {
-                if(getBitValue(opponent, i) == 1) {
-                    openMoves |= masks[i];
-                    break;
-                }
+        for(int i = pos; i % 8 != 0 && i < 64 && i >= 0; i--) {
+            if(getBitValue(me, i) == 0)
                 openMoves |= masks[i];
-            }
             else break;
+
+            if(getBitValue(opponent, i) == 1)
+                break;
         }
 
         // open moves up (white) or down (black)
-        i = pos - 8;
-        while(i >= 0) {
-            if(getBitValue(me, i) == 0) {
-                if(getBitValue(opponent, i) == 1) {
-                    openMoves |= masks[i];
-                    break;
-                }
+        for(int i = pos - 8; i >= 0 && i < 64; i -= 8) {
+            if(getBitValue(me, i) == 0)
                 openMoves |= masks[i];
-            }
             else break;
-            i -= 8;
+
+            if(getBitValue(opponent, i) == 1)
+                break;
         }
 
         // open moves down (white) or up (black)
-        i = pos + 8;
-        while(i < 64) {
-            if(getBitValue(me, i) == 0) {
-                if(getBitValue(opponent, i) == 1) {
-                    openMoves |= masks[i];
-                    break;
-                }
+        for(int i = pos + 8; i >= 0 && i < 64; i += 8) {
+            if(getBitValue(me, i) == 0)
                 openMoves |= masks[i];
-            }
             else break;
-            i += 8;
+
+            if(getBitValue(opponent, i) == 1)
+                break;
         }
         return openMoves;
     }
@@ -283,55 +266,43 @@ class BitBoard {
         long me = (s == true ? white : black);
 
         // open moves up-right (white) or down-left (black)
-        for(int i = pos; i % 8 != 7; i -= 7) {
-            if(i < 0 || i > 64)
-                break;
-
-            if(getBitValue(me, i) == 0) {
+        for(int i = pos; i % 8 != 7 && i >= 0 && i < 64; i -= 7) {
+            if(getBitValue(me, i) == 0)
                 openMoves |= masks[i];
-                if(getBitValue(opponent, i) == 1)
-                    break;
-            }
             else break;
+
+            if(getBitValue(opponent, i) == 1)
+                break;
         }
 
         // open moves up-left (white) or down-right (black)
-        for(int i = pos; i % 8 != 0; i -= 9) {
-            if(i < 0 || i > 64)
-                break;
-
-            if(getBitValue(me, i) == 0) {
+        for(int i = pos; i % 8 != 0 && i >= 0 && i < 64; i -= 9) {
+            if(getBitValue(me, i) == 0)
                 openMoves |= masks[i];
-                if(getBitValue(opponent, i) == 1)
-                    break;
-            }
             else break;
+
+            if(getBitValue(opponent, i) == 1)
+                break;
         }
 
         // open moves down-right (white) or up-left (black)
-        for(int i = pos; i % 8 != 7; i += 9) {
-            if(i < 0 || i > 64)
-                break;
-
-            if(getBitValue(me, i) == 0) {
+        for(int i = pos; i % 8 != 7 && i >= 0 && i < 64; i += 9) {
+            if(getBitValue(me, i) == 0)
                 openMoves |= masks[i];
-                if(getBitValue(opponent, i) == 1)
-                    break;
-            }
             else break;
+
+            if(getBitValue(opponent, i) == 1)
+                break;
         }
 
         // open moves down-left (white) or up-right (black)
-        for(int i = pos; i % 8 != 0; i += 7) {
-            if(i < 0 || i > 64)
-                break;
-
-            if(getBitValue(me, i) == 0) {
+        for(int i = pos; i % 8 != 0 && i >= 0 && i < 64; i += 7) {
+            if(getBitValue(me, i) == 0)
                 openMoves |= masks[i];
-                if(getBitValue(opponent, i) == 1)
-                    break;
-            }
             else break;
+
+            if(getBitValue(opponent, i) == 1)
+                break;
         }
         return openMoves;
     }
