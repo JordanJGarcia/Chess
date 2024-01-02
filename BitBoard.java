@@ -218,7 +218,7 @@ class BitBoard {
         long me = (s == true ? white : black);
 
         // open moves to the right (white) or left (black)
-        for(int i = pos; i % 8 != 7 && i < 64 && i >= 0; i++) {
+        for(int i = pos + 1; i % 8 != 0 && i < 64 && i >= 0;  i++) {
             if(getBitValue(me, i) == 0)
                 openMoves |= masks[i];
             else break;
@@ -228,7 +228,7 @@ class BitBoard {
         }
 
         // open moves to the left (white) or right (black)
-        for(int i = pos; i % 8 != 0 && i < 64 && i >= 0; i--) {
+        for(int i = pos - 1; i % 8 != 7 && i < 64 && i >= 0; i--) {
             if(getBitValue(me, i) == 0)
                 openMoves |= masks[i];
             else break;
@@ -266,7 +266,7 @@ class BitBoard {
         long me = (s == true ? white : black);
 
         // open moves up-right (white) or down-left (black)
-        for(int i = pos; i % 8 != 7 && i >= 0 && i < 64; i -= 7) {
+        for(int i = pos - 7; i % 8 != 0 && i >= 0 && i < 64; i -= 7) {
             if(getBitValue(me, i) == 0)
                 openMoves |= masks[i];
             else break;
@@ -276,7 +276,7 @@ class BitBoard {
         }
 
         // open moves up-left (white) or down-right (black)
-        for(int i = pos; i % 8 != 0 && i >= 0 && i < 64; i -= 9) {
+        for(int i = pos - 9; i % 8 != 7 && i >= 0 && i < 64; i -= 9) {
             if(getBitValue(me, i) == 0)
                 openMoves |= masks[i];
             else break;
@@ -286,7 +286,7 @@ class BitBoard {
         }
 
         // open moves down-right (white) or up-left (black)
-        for(int i = pos; i % 8 != 7 && i >= 0 && i < 64; i += 9) {
+        for(int i = pos + 9; i % 8 != 0 && i >= 0 && i < 64; i += 9) {
             if(getBitValue(me, i) == 0)
                 openMoves |= masks[i];
             else break;
@@ -296,7 +296,7 @@ class BitBoard {
         }
 
         // open moves down-left (white) or up-right (black)
-        for(int i = pos; i % 8 != 0 && i >= 0 && i < 64; i += 7) {
+        for(int i = pos + 7; i % 8 != 7 && i >= 0 && i < 64; i += 7) {
             if(getBitValue(me, i) == 0)
                 openMoves |= masks[i];
             else break;
@@ -388,16 +388,18 @@ class BitBoard {
     public static void main(String[] args) {
         BitBoard bb =  new BitBoard();
 
+        bb.print(bb.getRookMoves(47, true));
+        bb.print(bb.getBishopMoves(20, false));
         // play for black
-        long validMoves = bb.getPawnMoves(8, false, true);
-        bb.playForBlack(validMoves, 8, 24);
-        bb.printBitBoard();
-        bb.print(bb.getBlack());
-
-        // play for white
-        validMoves = bb.getPawnMoves(52, true, true);
-        bb.playForWhite(validMoves, 52, 36);
-        bb.printBitBoard();
-        bb.print(bb.getWhite());
+//        long validMoves = bb.getPawnMoves(8, false, true);
+//        bb.playForBlack(validMoves, 8, 24);
+//        bb.printBitBoard();
+//        bb.print(bb.getBlack());
+//
+//        // play for white
+//        validMoves = bb.getPawnMoves(52, true, true);
+//        bb.playForWhite(validMoves, 52, 36);
+//        bb.printBitBoard();
+//        bb.print(bb.getWhite());
     }
 }
