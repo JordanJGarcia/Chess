@@ -130,6 +130,7 @@ class BitBoard {
     int playForBlack(long moves, int from, int to) {
         long newBoard = moveBit(board, from, to, moves);
         long newBlack = moveBit(black, from, to, moves);
+        long tempWhite = white | masks[to];
 
         if(newBoard == 0L) {
             System.err.println("error: invalid move");
@@ -142,12 +143,18 @@ class BitBoard {
         }
         setBoard(newBoard);
         setBlack(newBlack);
+
+        // check if eating white piece
+        if(tempWhite == white)
+            setWhite(white & ~masks[to]);
+
         return 0;
     }
 
     int playForWhite(long moves, int from, int to) {
         long newBoard = moveBit(board, from, to, moves);
         long newWhite = moveBit(white, from, to, moves);
+        long tempBlack = black | masks[to];
 
         if(newBoard == 0L) {
             System.err.println("error: invalid move");
@@ -160,6 +167,11 @@ class BitBoard {
         }
         setBoard(newBoard);
         setWhite(newWhite);
+
+        // check if eating black piece
+        if(tempBlack == black)
+            setBlack(black & ~masks[to]);
+
         return 0;
     }
 
