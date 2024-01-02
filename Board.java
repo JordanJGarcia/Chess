@@ -59,6 +59,10 @@ class Board {
         return currentPlayer;
     }
 
+    Player getOpponent() {
+        return getCurrentPlayer() == getPlayerOne() ? getPlayerTwo() : getPlayerOne();
+    }
+
     BitBoard getBitBoard() {
         return bb;
     }
