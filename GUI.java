@@ -8,10 +8,7 @@ import javax.swing.border.LineBorder;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
-// a GUI will be the tier 1 encompassing class of the other objects in this package
-// it will contain the following:
-//      a single board, and within the board is:
-//          2 players with their pieces, and a bitboard (shared by both players)
+// class representing the GUI
 class GUI {
 
     GUI() {
@@ -31,24 +28,17 @@ class GUI {
         frame.getContentPane().add(BorderLayout.CENTER, bp);
 
         // display GUI
-        frame.setSize( 1100, 800 );
+        frame.setSize(1000, 700);
         frame.setVisible(true);
     }
 
 
     public static void main(String[] args) {
-        System.out.println("In GUI class");
         GUI gui = new GUI();
     }
 }
 
 // JPanel representing an area to display system messages
-//
-// remember panels are not visible, they are simply containers for other
-// visible components
-//
-// so you must add visible components to the panel in these classes
-// that will display on the screen
 class MessagePanel extends JPanel {
 
     MessagePanel() {
@@ -61,43 +51,57 @@ class MessagePanel extends JPanel {
 class BoardPanel extends JPanel implements ActionListener {
 
     private final int AMOUNT = 64;
-    private int lastClicked;
-    private long availableMoves;
+    private int last;
+    private long moves, attacks;
     
     private Board board;
 
     // squares on the board
     private SquareButton[] square = new SquareButton[AMOUNT];
+
+    // layout of the BoardPanel
     private GridLayout gl = new GridLayout(8, 8);
 
     // colors of the board
-    static Color black = new Color( 119,136,153 );
+    static Color black = new Color(119,136,153);
     static Color white = Color.WHITE;
-    static Color whitePiece = new Color( 255,200,113 );
     static Color blackPiece = Color.BLACK;
+    static Color whitePiece = new Color(255,200,113);
 
     BoardPanel() {
-        board = new Board();
         setLayout(gl);
+
+        setBoard(new Board());
         createBoard();
+
         setLastClicked(-1);
+        setMoves(0L);
+        setAttacks(0L);
     }
 
     // setters/getters
     void setLastClicked(int pos) {
-        lastClicked = pos;
+        last = pos;
     }
 
     int getLastClicked() {
-        return lastClicked;
+        return last;
     }
 
-    void setAvailableMoves(long l) {
-        availableMoves = l;
+    void setMoves(long l) {
+        moves = l;
     }
 
-    long getAvailableMoves() {
-        return availableMoves;
+    long getMoves() {
+        return moves;
+    }
+
+    void setAttacks(long l) {
+        attacks = l;
+    }
+
+    long getAttacks() {
+        return attacks;
     }
 
     void setBoard(Board b) {
@@ -148,13 +152,17 @@ class BoardPanel extends JPanel implements ActionListener {
         
         // set pieces
         for(Piece p : getBoard().getPlayerOne().getPieces()) {
-            square[p.getPosition()].setText(p.toString());
-            square[p.getPosition()].setForeground(whitePiece);
+            if(p != null) {
+                square[p.getPosition()].setText(p.toString());
+                square[p.getPosition()].setForeground(whitePiece);
+            }
         }
 
         for(Piece p : getBoard().getPlayerTwo().getPieces()) {
-            square[p.getPosition()].setText(p.toString());
-            square[p.getPosition()].setForeground(blackPiece);
+            if(p != null) {
+                square[p.getPosition()].setText(p.toString());
+                square[p.getPosition()].setForeground(blackPiece);
+            }
         }
     }
 
@@ -164,7 +172,7 @@ class BoardPanel extends JPanel implements ActionListener {
             return false;
 
         setLastClicked(-1);
-        setAvailableMoves(0L);
+        setMoves(0L);
         resetBoard();
         return true;
     }
@@ -181,7 +189,7 @@ class BoardPanel extends JPanel implements ActionListener {
 
         // reset data
         setLastClicked(-1);
-        setAvailableMoves(0L);
+        setMoves(0L);
 
         // switch players
         getBoard().switchPlayers();
@@ -195,21 +203,20 @@ class BoardPanel extends JPanel implements ActionListener {
     // display available moves for a piece
     void displayMoves(int pos) {
         getBoard().getCurrentPlayer().updateMoves();
-        setAvailableMoves(getBoard().getCurrentPlayer().getMovesAt(pos));
+        setMoves(getBoard().getCurrentPlayer().getMovesAt(pos));
+        setAttacks(getBoard().getBitBoard().getAttacks(getMoves(), getBoard().getCurrentPlayer().getSide()));
 
         Color m = new Color(134, 226, 116);
         Color a = new Color(181, 101, 104);
 
-        if(getAvailableMoves() == 0L)
+        if(getMoves() == 0L)
             return;
 
-        long attacks = getBoard().getBitBoard().getAttacks(getAvailableMoves(), getBoard().getCurrentPlayer().getSide());
-
         for(int i = 0; i < AMOUNT; i++) {
-            if(validMove(attacks, i))
+            if(validMove(getAttacks(), i))
                 square[i].setBackground(a);
             else {
-                if(validMove(getAvailableMoves(), i))
+                if(validMove(getMoves(), i))
                     square[i].setBackground(m);
             }
         }
@@ -217,13 +224,12 @@ class BoardPanel extends JPanel implements ActionListener {
 
     // action listener for the squares
     public void actionPerformed(ActionEvent e) {
-
         SquareButton s = (SquareButton)e.getSource();
 
         if(clickedSameSquare(s.getPosition()))
             return;
 
-        if(validMove(getAvailableMoves(), s.getPosition())) {
+        if(validMove(getMoves(), s.getPosition())) {
             if(attemptMove(s.getPosition()))
                 return;
         }
