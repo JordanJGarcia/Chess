@@ -167,6 +167,7 @@ class BoardPanel extends JPanel implements ActionListener {
 
         setLastClicked(-1);
         setMoves(0L);
+        setAttacks(0L);
         resetBoard();
         return true;
     }

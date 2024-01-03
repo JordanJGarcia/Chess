@@ -12,6 +12,9 @@ class Board {
     // a board will have an index of all pieces
     private Piece index[] = new Piece[64];
 
+    // a board will record eaten pieces
+    ArrayList<Piece> eaten = new ArrayList<Piece>(32);
+
     // constructor
     Board() {
         bb = new BitBoard();
@@ -105,6 +108,9 @@ class Board {
         return index[pos];
     }
 
+    void showEaten() {
+        System.out.println("Eaten pieces: " + eaten);
+    }
 
     // game functionality
     void movePiece(int from, int to) {
@@ -118,6 +124,10 @@ class Board {
         // ensure we are moving proper piece
         if(getIndexAt(from).getSide() != getCurrentPlayer().getSide())
             return -1;
+        
+        // check if we are eating an opponent piece
+        if(getIndexAt(to).getType() != Type.NON && getIndexAt(to).getSide() == getOpponent().getSide())
+            eaten.add(getIndexAt(to));
 
         int rc = -1;
 
