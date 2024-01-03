@@ -119,8 +119,6 @@ class BoardPanel extends JPanel implements ActionListener {
 
     //functions to create/reset the board
     void createBoard() {
-        int row = 0;
-
         for(int i = 0; i < AMOUNT; i++) {
             square[i] = new SquareButton(i);
 
@@ -179,6 +177,11 @@ class BoardPanel extends JPanel implements ActionListener {
 
     // attempt to move a piece
     boolean attemptMove(int pos) {
+        // check if valid move
+        if(!validMove(getMoves(), pos))
+            return false;
+
+        // check if move was accepted
         if(getBoard().requestMove(getLastClicked(), pos) == -1)
             return false;
 
@@ -225,10 +228,8 @@ class BoardPanel extends JPanel implements ActionListener {
         if(clickedSameSquare(s.getPosition()))
             return;
 
-        if(validMove(getMoves(), s.getPosition())) {
-            if(attemptMove(s.getPosition()))
-                return;
-        }
+        if(attemptMove(s.getPosition()))
+            return;
 
         // reset the board
         resetBoard();

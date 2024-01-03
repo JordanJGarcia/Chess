@@ -17,7 +17,7 @@ class Board {
 
     // constructor
     Board() {
-        bb = new BitBoard();
+        setBitBoard(new BitBoard());
         setPieces();
         setPlayerOne(new Player(WHITE));
         setPlayerTwo(new Player(BLACK));
@@ -144,9 +144,6 @@ class Board {
     }
 
     void switchPlayers() {
-        if(getCurrentPlayer() == getPlayerOne())
-            setCurrentPlayer(getPlayerTwo());
-        else
-            setCurrentPlayer(getPlayerOne());
+        setCurrentPlayer(getOpponent());
     }
 }
