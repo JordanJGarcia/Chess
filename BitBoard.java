@@ -100,20 +100,20 @@ class BitBoard {
         board = val;
     }
 
-    long getBoard() {
-        return board;
-    }
-
     void setWhite(long val) {
         white = val;
     }
 
-    long getWhite() {
-        return white;
-    }
-
     void setBlack(long val) {
         black = val;
+    }
+
+    long getBoard() {
+        return board;
+    }
+
+    long getWhite() {
+        return white;
     }
 
     long getBlack() {
@@ -175,7 +175,7 @@ class BitBoard {
     // PAWN
     long getPawnMoves(int pos, boolean s, boolean firstMove) {
         long openMoves = 0L;
-        long opponent = (s == true ? black : white);
+        long opponent = (s ? black : white);
         int loc;
 
         if(s == true) {
@@ -220,8 +220,8 @@ class BitBoard {
     // ROOK
     long getRookMoves(int pos, boolean s) {
         long openMoves = 0L;
-        long opponent = (s == true ? black : white);
-        long me = (s == true ? white : black);
+        long opponent = (s ? black : white);
+        long me = (s ? white : black);
 
         // open moves to the right (white) or left (black)
         for(int i = pos + 1; i % 8 != 0 && i < 64 && i >= 0;  i++) {
@@ -268,8 +268,8 @@ class BitBoard {
     // BISHOP
     long getBishopMoves(int pos, boolean s) {
         long openMoves = 0L;
-        long opponent = (s == true ? black : white);
-        long me = (s == true ? white : black);
+        long opponent = (s ? black : white);
+        long me = (s ? white : black);
 
         // open moves up-right (white) or down-left (black)
         for(int i = pos - 7; i % 8 != 0 && i >= 0 && i < 64; i -= 7) {
@@ -359,8 +359,8 @@ class BitBoard {
     // KING
     long getKingMoves(int pos, boolean s) {
         long openMoves = 0L;
-        long opponent = (s == true ? black : white);
-        long me = (s == true ? white : black);
+        long opponent = (s ? black : white);
+        long me = (s ? white : black);
         int[] val = {1, 7, 8, 9};
         int loc, offset;
 
@@ -384,7 +384,7 @@ class BitBoard {
 
     // generate available attacks for a piece
     long getAttacks(long moves, boolean s) {
-        long opponent = (s == true ? black : white);
+        long opponent = (s ? black : white);
         return moves & opponent;
     }
 }

@@ -89,28 +89,28 @@ class BoardPanel extends JPanel implements ActionListener {
         last = pos;
     }
 
-    int getLastClicked() {
-        return last;
-    }
-
     void setMoves(long l) {
         moves = l;
-    }
-
-    long getMoves() {
-        return moves;
     }
 
     void setAttacks(long l) {
         attacks = l;
     }
 
-    long getAttacks() {
-        return attacks;
-    }
-
     void setBoard(Board b) {
         board = b;
+    }
+
+    int getLastClicked() {
+        return last;
+    }
+
+    long getMoves() {
+        return moves;
+    }
+
+    long getAttacks() {
+        return attacks;
     }
 
     Board getBoard() {

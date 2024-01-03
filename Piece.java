@@ -49,6 +49,7 @@ class Piece {
         setNumMoves(-1);
     }
     
+    // setters/getters
     void setPosition(int p) {
         position = p;
     }   
