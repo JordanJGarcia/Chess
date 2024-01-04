@@ -10,14 +10,6 @@ import java.lang.Math;
 // etc ?
 // ... food for thought
 
-enum pc {
-    K, // king
-    Q, // queen
-    R, // rook
-    N, // knight
-    P  // pawn
-}
-
 class BitBoard {
 
     private long[] masks = null;
@@ -29,7 +21,7 @@ class BitBoard {
     private long black;
 
     // these will hold the states of each players individual pieces
-    private final long[] WHITE = {
+    private long[] WHITE = {
         0x1000000000000000L, // KING
         0x0800000000000000L, // QUEEN
         0x8100000000000000L, // ROOK
@@ -38,7 +30,7 @@ class BitBoard {
         0x00FF000000000000L, // PAWN
     };
     
-    private final long[] BLACK = {
+    private long[] BLACK = {
         0x0000000000000010L, // KING   
         0x0000000000000008L, // QUEEN  
         0x0000000000000081L, // ROOK   
@@ -60,23 +52,30 @@ class BitBoard {
 
     // creates the initial board to play on
     void createBoard() {
-        initializeWhiteBits();
-        initializeBlackBits();
-        board = black | white;
+        updateWhite();
+        updateBlack();
+        updateBoard();
 
         System.out.println("\nBoard state: \n");
         print(board);
     }
 
-    void initializeWhiteBits() {
+    // updates the board states
+    void updateWhite() {
+        white = 0L;
         for(int i = 0; i < WHITE.length; i++)
             white |= WHITE[i];
     }
 
-    void initializeBlackBits() {
+    void updateBlack() {
+        black = 0L;
         for(int i = 0; i < BLACK.length; i++)
             black |= BLACK[i];
     }    
+
+    void updateBoard() {
+        board = black | white;
+    }
 
     // prints state of a long (board)
     void print(long l) {
@@ -99,29 +98,24 @@ class BitBoard {
         return ((mask >> pos) & 1);
     }
 
-    // moves a bit in board b from position o to position n,
-    // only if it exists in board g as well
-    long moveBit(long b, int o, int n, long g) {
-
-        if((masks[n] & g) != masks[n])
-            return 0L;
-
+    // moves a bit in board b from position o to position n
+    long moveBit(long b, int o, int n) {
         long r = b | masks[n];
         r &= ~(1L << o);
         return r;
     }
 
     // setters/getters
-    void setBoard(long val) {
-        board = val;
+    void setBoard(long l) {
+        board = l;
     }
 
-    void setWhite(long val) {
-        white = val;
+    void setWhite(long l) {
+        white = l;
     }
 
-    void setBlack(long val) {
-        black = val;
+    void setBlack(long l) {
+        black = l;
     }
 
     long getBoard() {
@@ -137,56 +131,38 @@ class BitBoard {
     }
 
     // play
-    int playForBlack(long moves, int from, int to) {
-        long newBoard = moveBit(board, from, to, moves);
-        long newBlack = moveBit(black, from, to, moves);
-        long tempWhite = white | masks[to];
-
-        if(newBoard == 0L) {
-            System.err.println("error: invalid move");
+    int requestMove(Piece from, Piece to) {
+        // error checking
+        if(from.getType() == -1)
             return -1;
+
+        long moves = from.getMoves();
+
+        long[] me = from.getSide() ? WHITE : BLACK;
+        long[] opponent = from.getSide() ? BLACK : WHITE;
+
+        // ensure this is a valid move
+        if((masks[to.getPosition()] & moves) != masks[to.getPosition()])
+            return -1;
+
+        // move piece
+        me[from.getType()] = moveBit(me[from.getType()], from.getPosition(), to.getPosition());
+
+        // check if we are eating opponent
+        if(to.getType() != -1) {
+            if((opponent[to.getType()] | masks[to.getPosition()]) == opponent[to.getType()])
+                opponent[to.getType()] &= ~masks[to.getPosition()];
         }
 
-        if(newBlack == 0L) {
-            System.err.println("error: could not set black bitboard");
-            return -1;
-        }
-        setBoard(newBoard);
-        setBlack(newBlack);
-
-        // check if eating white piece
-        if(tempWhite == white)
-            setWhite(white & ~masks[to]);
-
+        // update board states
+        updateWhite();
+        updateBlack();
+        updateBoard();
         return 0;
     }
 
-    int playForWhite(long moves, int from, int to) {
-        long newBoard = moveBit(board, from, to, moves);
-        long newWhite = moveBit(white, from, to, moves);
-        long tempBlack = black | masks[to];
-
-        if(newBoard == 0L) {
-            System.err.println("error: invalid move");
-            return -1;
-        }
-
-        if(newWhite == 0L) {
-            System.err.println("error: could not set white bitboard");
-            return -1;
-        }
-        setBoard(newBoard);
-        setWhite(newWhite);
-
-        // check if eating black piece
-        if(tempBlack == black)
-            setBlack(black & ~masks[to]);
-
-        return 0;
-    }
-
-
-    // the below functions will generate masks of available moves for each piece
+    
+    // methods to get pieces moves
 
     // PAWN
     long getPawnMoves(int pos, boolean s, boolean firstMove) {
@@ -388,7 +364,7 @@ class BitBoard {
         return moves;
     }
 
-    // generate available attacks for a piece
+    // method to get piece attacks based on moves
     long getAttacks(long moves, boolean s) {
         return moves & (s ? black : white);
     }
