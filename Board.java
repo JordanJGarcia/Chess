@@ -120,26 +120,23 @@ class Board {
         return;
     }
 
-    int requestMove(int from, int to) {
+    int requestMove(int f, int t) {
+        Piece from = getIndexAt(f);
+        Piece to = getIndexAt(t);
+
         // ensure we are moving proper piece
-        if(getIndexAt(from).getSide() != getCurrentPlayer().getSide())
+        if(from.getSide() != getCurrentPlayer().getSide())
             return -1;
         
-        // check if we are eating an opponent piece
-        if(getIndexAt(to).getType() != Type.NON && getIndexAt(to).getSide() == getOpponent().getSide())
-            eaten.add(getIndexAt(to));
-
-        int rc = -1;
-
-        if(getCurrentPlayer().getSide() == BLACK)
-            rc = getBitBoard().playForBlack(index[from].getMoves(), from, to);
-        else
-            rc = getBitBoard().playForWhite(index[from].getMoves(), from, to);
-
-        if(rc == -1)
+        // request move from bitboard
+        if(getBitBoard().requestMove(from, to) == -1)
             return -1;
 
-        movePiece(from, to);
+        // check if we are eating an opponent piece
+        if(to.getType() != -1 && to.getSide() == getOpponent().getSide())
+            eaten.add(to);
+
+        movePiece(f, t);
         return 0;
     }
 
