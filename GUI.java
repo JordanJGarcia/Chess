@@ -34,7 +34,11 @@ class GUI {
 
 
     public static void main(String[] args) {
-        GUI gui = new GUI();
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                GUI gui = new GUI();
+            }
+        });
     }
 }
 
@@ -139,7 +143,7 @@ class BoardPanel extends JPanel implements ActionListener {
             square[i].setOpaque(true);
             square[i].setText(boardIndex[i].toString());
 
-            if(boardIndex[i].getType() != Type.NON)
+            if(boardIndex[i].getType() != -1)
                 square[i].setForeground(boardIndex[i].getSide() == WHITE ? whitePiece : blackPiece);
 
             // new row
@@ -171,17 +175,17 @@ class BoardPanel extends JPanel implements ActionListener {
     }
 
     // check if user chose a valid move
-    boolean validMove(long mask, int pos) {
+    boolean bitIsSet(long mask, int pos) {
         return getBoard().getBitBoard().getBitValue(mask ,pos) == 1;
     }
 
     // attempt to move a piece
     boolean attemptMove(int pos) {
-        // check if valid move
-        if(!validMove(getMoves(), pos))
+        // verify moves have been initialized
+        if(getMoves() == 0L)
             return false;
 
-        // check if move was accepted
+        // request to make move to pos
         if(getBoard().requestMove(getLastClicked(), pos) == -1)
             return false;
 
@@ -201,21 +205,20 @@ class BoardPanel extends JPanel implements ActionListener {
 
     // display available moves for a piece
     void displayMoves(int pos) {
-
         setMoves(getBoard().getIndexAt(pos).getMoves());
         setAttacks(getBoard().getBitBoard().getAttacks(getMoves(), getBoard().getCurrentPlayer().getSide()));
-
-        Color m = new Color(134, 226, 116);
-        Color a = new Color(181, 101, 104);
 
         if(getMoves() == 0L)
             return;
 
+        Color m = new Color(134, 226, 116);
+        Color a = new Color(181, 101, 104);
+
         for(int i = 0; i < AMOUNT; i++) {
-            if(validMove(getAttacks(), i))
+            if(bitIsSet(getAttacks(), i))
                 square[i].setBackground(a);
             else {
-                if(validMove(getMoves(), i))
+                if(bitIsSet(getMoves(), i))
                     square[i].setBackground(m);
             }
         }
