@@ -3,16 +3,6 @@ package chess;
 import java.util.*;
 import java.awt.*;
 
-enum Type {
-    NON,
-    PAWN,
-    ROOK,
-    BISHOP,
-    KNIGHT,
-    QUEEN,
-    KING
-}
-
 class Piece {
     protected final boolean WHITE = true, BLACK = false;
 
@@ -23,7 +13,7 @@ class Piece {
     private int numMoves;
 
     // each piece has a type
-    private Type type;
+    private int type;
 
     // each piece belongs to a player
     boolean side;           
@@ -32,7 +22,7 @@ class Piece {
     private BitBoard bb;
 
     // constructor
-    Piece(Type t, int p, boolean s, BitBoard b) {
+    Piece(int t, int p, boolean s, BitBoard b) {
         setType(t);
         setPosition(p);
         setSide(s);
@@ -41,7 +31,7 @@ class Piece {
     }
 
     // non-piece constructor
-    Piece(Type t, int p) {
+    Piece(int t, int p) {
         setType(t);
         setPosition(p);
         setSide(false);
@@ -58,7 +48,7 @@ class Piece {
         numMoves = n;
     }
 
-    void setType(Type t) {
+    void setType(int t) {
         type = t;
     }
 
@@ -78,7 +68,7 @@ class Piece {
         return numMoves;
     }
     
-    Type getType() {
+    int getType() {
         return type;
     }
 
@@ -111,7 +101,7 @@ class Non extends Piece
     }
 
     Non(int p) {
-        super(Type.NON, p);
+        super(-1, p);
     }
 
     long getMoves() {
@@ -128,7 +118,7 @@ class Pawn extends Piece
     }
 
     Pawn(int p, boolean s, BitBoard b) {
-        super(Type.PAWN, p, s, b);
+        super(5, p, s, b);
     }
     
     long getMoves() {
@@ -146,7 +136,7 @@ class Rook extends Piece
     }
         
     Rook(int p, boolean s, BitBoard b) {
-        super(Type.ROOK, p, s, b);
+        super(2, p, s, b);
     }
     
     long getMoves() {
@@ -163,7 +153,7 @@ class Bishop extends Piece
     }
         
     Bishop(int p, boolean s, BitBoard b) {
-        super(Type.BISHOP, p, s, b);
+        super(3, p, s, b);
     }
     
     long getMoves() {
@@ -180,7 +170,7 @@ class Knight extends Piece
     }
         
     Knight(int p, boolean s, BitBoard b) {
-        super(Type.KNIGHT, p, s, b);
+        super(4, p, s, b);
     }
     
     long getMoves() {
@@ -198,7 +188,7 @@ class Queen extends Piece
     }
         
     Queen(int p, boolean s, BitBoard b) {
-        super(Type.QUEEN, p, s, b);
+        super(1, p, s, b);
     }
     
     long getMoves() {
@@ -215,7 +205,7 @@ class King extends Piece
     }
 
     King(int p, boolean s, BitBoard b) {
-        super(Type.KING, p, s, b);
+        super(0, p, s, b);
     }    
 
     long getMoves() {
