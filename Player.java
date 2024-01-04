@@ -24,6 +24,6 @@ class Player {
     }
 
     @Override public String toString() {
-        return("Player: " + getSide());
+        return("Player: " + (getSide() ? "WHITE" : "BLACK"));
     }
 }

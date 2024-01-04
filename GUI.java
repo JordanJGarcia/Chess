@@ -205,7 +205,7 @@ class BoardPanel extends JPanel implements ActionListener {
 
     // display available moves for a piece
     void displayMoves(int pos) {
-        setMoves(getBoard().getIndexAt(pos).getMoves());
+        setMoves(getBoard().getPieceAt(pos).getMoves());
         setAttacks(getBoard().getBitBoard().getAttacks(getMoves(), getBoard().getCurrentPlayer().getSide()));
 
         if(getMoves() == 0L)
@@ -244,7 +244,7 @@ class BoardPanel extends JPanel implements ActionListener {
         setLastClicked(s.getPosition());
 
         // show available moves
-        if(getBoard().getIndexAt(s.getPosition()).getSide() == getBoard().getCurrentPlayer().getSide())
+        if(getBoard().getPieceAt(s.getPosition()).getSide() == getBoard().getCurrentPlayer().getSide())
             displayMoves(s.getPosition());
     }
 }

@@ -101,7 +101,7 @@ class Board {
         return index;
     }
 
-    Piece getIndexAt(int pos) {
+    Piece getPieceAt(int pos) {
         if(pos < 0 || pos > 63)
             return null;
 
@@ -114,15 +114,18 @@ class Board {
 
     // game functionality
     void movePiece(int from, int to) {
+        // update piece data
         index[from].movePiece(to);
+
+        // update piece index
         index[to] = index[from];
         index[from] = new Non(from);
         return;
     }
 
     int requestMove(int f, int t) {
-        Piece from = getIndexAt(f);
-        Piece to = getIndexAt(t);
+        Piece from = getPieceAt(f);
+        Piece to = getPieceAt(t);
 
         // ensure we are moving proper piece
         if(from.getSide() != getCurrentPlayer().getSide())
@@ -132,7 +135,7 @@ class Board {
         if(getBitBoard().requestMove(from, to) == -1)
             return -1;
 
-        // check if we are eating an opponent piece
+        // check if we ate an opponent piece
         if(to.getType() != -1 && to.getSide() == getOpponent().getSide())
             eaten.add(to);
 

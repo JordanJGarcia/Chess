@@ -1,0 +1,33 @@
+How do I incorporate rules?
+
+    check
+    checkmate
+    stalemate
+    en passant
+    castle
+
+hmmmmmmm
+
+maybe play out the move on the bitboard, and then see if that places a piece in check, and if it does, reject the original move?? 
+    idk this sounds not the best
+
+
+orrrrrrrrrrrrrrrrrr (pseudo-code)
+
+if(kingLocation is in attackMask of any opponent piece)
+    you are in check
+
+if(moving this piece puts king in opponents attack mask)
+    you cannot move this piece
+
+if(only both kings left, or only one king left and it cannot move anywhere but is not in check)
+    you are in stalemate
+
+if(pawn passed current piece, and it was the pawns first move)
+    qualifies for en passant
+
+if(king is not in check, and there are no pieces between it and the rook)
+    you can castle
+
+
+The above should now be more feasible since I am recording the positions of pieces based on their types
