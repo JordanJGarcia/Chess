@@ -4,16 +4,32 @@ import java.util.*;
 import java.awt.*;
 import java.lang.Math;
 
+// should we record each set of pieces as they move?
+// black pawns/white pawns
+// b knights/w knights
+// etc ?
+// ... food for thought
+
+enum pc {
+    K, // king
+    Q, // queen
+    R, // rook
+    N, // knight
+    P  // pawn
+}
+
 class BitBoard {
 
     private long[] masks = null;
 
-    // long availableSpots;
+    // these will hold the states of the entire board
+    // and of all player pieces together
     private long board;
     private long white;
     private long black;
 
-    final long[] WHITEPIECES = {
+    // these will hold the states of each players individual pieces
+    private final long[] WHITE = {
         0x1000000000000000L, // KING
         0x0800000000000000L, // QUEEN
         0x8100000000000000L, // ROOK
@@ -22,7 +38,7 @@ class BitBoard {
         0x00FF000000000000L, // PAWN
     };
     
-    final long[] BLACKPIECES = {
+    private final long[] BLACK = {
         0x0000000000000010L, // KING   
         0x0000000000000008L, // QUEEN  
         0x0000000000000081L, // ROOK   
@@ -53,13 +69,13 @@ class BitBoard {
     }
 
     void initializeWhiteBits() {
-        for(int i = 0; i < WHITEPIECES.length; i++)
-            white |= WHITEPIECES[i];
+        for(int i = 0; i < WHITE.length; i++)
+            white |= WHITE[i];
     }
 
     void initializeBlackBits() {
-        for(int i = 0; i < BLACKPIECES.length; i++)
-            black |= BLACKPIECES[i];
+        for(int i = 0; i < BLACK.length; i++)
+            black |= BLACK[i];
     }    
 
     // prints state of a long (board)
@@ -174,148 +190,141 @@ class BitBoard {
 
     // PAWN
     long getPawnMoves(int pos, boolean s, boolean firstMove) {
-        long openMoves = 0L;
+        long moves = 0L;
+        long attacks = 0L;
         long opponent = (s ? black : white);
-        int loc;
 
+        // get all possible moves and attacks
         if(s == true) {
-            loc = pos - 8;
-            if(getBitValue(board, loc) == 0) {
-                openMoves = masks[loc];
+            moves |= masks[pos - 8];
 
-                // can move two positions on first move
-                if(firstMove && getBitValue(board, loc - 8) == 0)
-                    openMoves |= masks[loc - 8];
-            }
-            // add attacks if they exist
-            loc = pos - 7;
-            if(pos % 8 != 7 && getBitValue(opponent, loc) == 1)
-                openMoves |= masks[loc];
+            if(firstMove)
+                moves |= masks[pos - 16];
 
-            loc = pos - 9;
-            if(pos % 8 != 0 && getBitValue(opponent, loc) == 1)
-                openMoves |= masks[loc];
+            attacks |= masks[pos - 7];
+            attacks |= masks[pos - 9];
         }
         else {
-            loc = pos + 8;
-            if(getBitValue(board, loc) == 0) {
-                openMoves = masks[loc];
+            moves |= masks[pos + 8];
 
-                // can move two positions on first move
-                if(firstMove && getBitValue(board, loc + 8) == 0)
-                    openMoves |= masks[loc + 8];
-            }
-            // add attacks if they exist
-            loc = pos + 7;
-            if(pos % 8 != 0 && getBitValue(opponent, loc) == 1)
-                openMoves |= masks[loc];
+            if(firstMove)
+                moves |= masks[pos + 16];
 
-            loc = pos + 9;
-            if(pos % 8 != 7 && getBitValue(opponent, loc) == 1)
-                openMoves |= masks[loc];
+            attacks |= masks[pos + 7];
+            attacks |= masks[pos + 9];
         }
-        return openMoves;
+
+        // moves should NOT have opponent bit set
+        moves &= ~opponent;
+        
+        // attacks should have the opponent bit set
+        attacks &= opponent;
+
+        // combine
+        return moves |= attacks;
     }
 
     // ROOK
     long getRookMoves(int pos, boolean s) {
-        long openMoves = 0L;
+        long moves = 0L;
         long opponent = (s ? black : white);
         long me = (s ? white : black);
 
         // open moves to the right (white) or left (black)
         for(int i = pos + 1; i % 8 != 0 && i < 64 && i >= 0;  i++) {
-            if(getBitValue(me, i) == 0)
-                openMoves |= masks[i];
+            if((masks[i] & me) == 0L)
+                moves |= masks[i];
             else break;
 
-            if(getBitValue(opponent, i) == 1)
+            if((masks[i] & opponent) == masks[i])
                 break;
         }
 
         // open moves to the left (white) or right (black)
         for(int i = pos - 1; i % 8 != 7 && i < 64 && i >= 0; i--) {
-            if(getBitValue(me, i) == 0)
-                openMoves |= masks[i];
+            if((masks[i] & me) == 0L)
+                moves |= masks[i];
             else break;
 
-            if(getBitValue(opponent, i) == 1)
+            if((masks[i] & opponent) == masks[i])
                 break;
         }
 
         // open moves up (white) or down (black)
         for(int i = pos - 8; i >= 0 && i < 64; i -= 8) {
-            if(getBitValue(me, i) == 0)
-                openMoves |= masks[i];
+            if((masks[i] & me) == 0L)
+                moves |= masks[i];
             else break;
 
-            if(getBitValue(opponent, i) == 1)
+            if((masks[i] & opponent) == masks[i])
                 break;
         }
 
         // open moves down (white) or up (black)
         for(int i = pos + 8; i >= 0 && i < 64; i += 8) {
-            if(getBitValue(me, i) == 0)
-                openMoves |= masks[i];
+            if((masks[i] & me) == 0L)
+                moves |= masks[i];
             else break;
 
-            if(getBitValue(opponent, i) == 1)
+            if((masks[i] & opponent) == masks[i])
                 break;
         }
-        return openMoves;
+        return moves;
     }
 
     // BISHOP
     long getBishopMoves(int pos, boolean s) {
-        long openMoves = 0L;
+        long moves = 0L;
         long opponent = (s ? black : white);
         long me = (s ? white : black);
 
         // open moves up-right (white) or down-left (black)
         for(int i = pos - 7; i % 8 != 0 && i >= 0 && i < 64; i -= 7) {
-            if(getBitValue(me, i) == 0)
-                openMoves |= masks[i];
+            if((masks[i] & me) == 0L)
+                moves |= masks[i];
             else break;
 
-            if(getBitValue(opponent, i) == 1)
+            if((masks[i] & opponent) == masks[i])
                 break;
         }
 
         // open moves up-left (white) or down-right (black)
         for(int i = pos - 9; i % 8 != 7 && i >= 0 && i < 64; i -= 9) {
-            if(getBitValue(me, i) == 0)
-                openMoves |= masks[i];
+            if((masks[i] & me) == 0L)
+                moves |= masks[i];
             else break;
 
-            if(getBitValue(opponent, i) == 1)
+            if((masks[i] & opponent) == masks[i])
                 break;
         }
 
         // open moves down-right (white) or up-left (black)
         for(int i = pos + 9; i % 8 != 0 && i >= 0 && i < 64; i += 9) {
-            if(getBitValue(me, i) == 0)
-                openMoves |= masks[i];
+            if((masks[i] & me) == 0L)
+                moves |= masks[i];
             else break;
 
-            if(getBitValue(opponent, i) == 1)
+            if((masks[i] & opponent) == masks[i])
                 break;
         }
 
         // open moves down-left (white) or up-right (black)
         for(int i = pos + 7; i % 8 != 7 && i >= 0 && i < 64; i += 7) {
-            if(getBitValue(me, i) == 0)
-                openMoves |= masks[i];
+            if((masks[i] & me) == 0L)
+                moves |= masks[i];
             else break;
 
-            if(getBitValue(opponent, i) == 1)
+            if((masks[i] & opponent) == masks[i])
                 break;
         }
-        return openMoves;
+        return moves;
     }
 
     // KNIGHT
     long getKnightMoves(int pos, boolean s) {
-        long openMoves = 0L;
+        long moves = 0L;
+        long me = (s ? white : black);
+
         int[] val = {6, 10, 15, 17}; // all positions knight can move (up or down from current pos)
         int loc;
 
@@ -323,68 +332,64 @@ class BitBoard {
             if(v == 6 || v == 15) {
                 loc = pos - v;
                 if(loc % 8 > pos % 8 && loc >= 0)
-                    openMoves |= masks[loc];
+                    moves |= masks[loc];
 
                 loc = pos + v;
                 if(loc % 8 < pos % 8 && loc < 64)
-                    openMoves |= masks[loc];
+                    moves |= masks[loc];
             }
             else {
                 loc = pos - v;
                 if(loc % 8 < pos % 8 && loc >= 0)
-                    openMoves |= masks[loc];
+                    moves |= masks[loc];
 
                 loc = pos + v;
                 if(loc % 8 > pos % 8 && loc < 64)
-                    openMoves |= masks[loc];
+                    moves |= masks[loc];
             }
         }
-
-        if(s == true)
-            return openMoves & ~white;
-
-        return openMoves & ~black;
+        return moves & ~me;
     }
 
     // QUEEN
     long getQueenMoves(int pos, boolean s) {
-        long openMoves = 0L;
+        long moves = 0L;
 
-        openMoves |= getRookMoves(pos, s);
-        openMoves |= getBishopMoves(pos, s);
+        moves |= getRookMoves(pos, s);
+        moves |= getBishopMoves(pos, s);
 
-        return openMoves;
+        return moves;
     }
 
     // KING
     long getKingMoves(int pos, boolean s) {
-        long openMoves = 0L;
+        long moves = 0L;
         long opponent = (s ? black : white);
         long me = (s ? white : black);
+
         int[] val = {1, 7, 8, 9};
         int loc, offset;
 
         for(int v : val) {
             loc = pos - v;
             offset = Math.abs((loc % 8) - (pos % 8));
-            if(offset == 0 || offset == 1) {
-                if((getBitValue(me, loc) == 0 || getBitValue(opponent, loc) == 1) && loc >= 0)
-                    openMoves |= masks[loc];
+            if(loc >= 0 && offset == 0 || offset == 1) {
+                if((masks[loc] & me) == 0L || (masks[loc] & opponent) == masks[loc])
+                    moves |= masks[loc];
             }
 
             loc = pos + v;
             offset = Math.abs((loc % 8) - (pos % 8));
-            if(offset == 0 || offset == 1) {
-                if((getBitValue(me, loc) == 0 || getBitValue(opponent, loc) == 1) && loc < 64)
-                    openMoves |= masks[loc];
+            if(loc < 64 && offset == 0 || offset == 1) {
+                if((masks[loc] & me) == 0L || (masks[loc] & opponent) == masks[loc])
+                    moves |= masks[loc];
             }
         } 
-        return openMoves;
+        return moves;
     }
 
     // generate available attacks for a piece
     long getAttacks(long moves, boolean s) {
-        long opponent = (s ? black : white);
-        return moves & opponent;
+        return moves & (s ? black : white);
     }
 }
